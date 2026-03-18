@@ -67,7 +67,7 @@ export function Sidebar(_props: SidebarProps) {
       <div className={styles.footer}>
         <span className={styles.statusDot}>
           <span className={styles.dot} />
-          API connected_
+          API connected
         </span>
       </div>
     </nav>
