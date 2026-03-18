@@ -1,9 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
+import type { Server } from 'socket.io';
 import type { CreateTaskInput, Task } from '@devpigh/shared';
+import type { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from '@devpigh/shared';
 import type { ITaskRepository, PagedResult, PaginationOptions } from '../interfaces';
+
+type IO = Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>;
 
 export class InMemoryTaskRepository implements ITaskRepository {
   private tasks: Map<string, Task> = new Map();
+  private io: IO | null = null;
+
+  setIO(io: IO): void {
+    this.io = io;
+  }
 
   async findByAgentId(agentId: string, opts: PaginationOptions): Promise<PagedResult<Task>> {
     const all = Array.from(this.tasks.values())
@@ -37,7 +46,17 @@ export class InMemoryTaskRepository implements ITaskRepository {
       createdAt: now,
     };
     this.tasks.set(task.id, task);
+    this.io?.emit('task:update', task);
     return task;
+  }
+
+  async update(id: string, patch: Partial<Task>): Promise<Task | null> {
+    const existing = this.tasks.get(id);
+    if (!existing) return null;
+    const updated: Task = { ...existing, ...patch };
+    this.tasks.set(id, updated);
+    this.io?.emit('task:update', updated);
+    return updated;
   }
 
   async findCompletedSince(since: Date): Promise<Task[]> {

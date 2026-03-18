@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import type { Agent, AgentStatus } from '@devpigh/shared';
 import { api } from '@/api/client';
 import { StatusBadge } from '@/components';
+import { useAgentUpdates } from '@/hooks/useAgentUpdates';
 import styles from './Agents.module.css';
 
 type SortKey = 'name' | 'status' | 'type' | 'lastHeartbeat' | 'createdAt';
@@ -26,12 +27,21 @@ export function Agents() {
   const [sortKey, setSortKey] = useState<SortKey>('createdAt');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
 
+  const liveUpdates = useAgentUpdates();
+
   useEffect(() => {
     api.agents.list()
       .then(setAgents)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
+
+  // Merge live status updates into the agent list
+  const mergedAgents = agents.map((a) => {
+    const update = liveUpdates.get(a.id);
+    if (!update) return a;
+    return { ...a, status: update.status, lastHeartbeat: update.lastHeartbeat };
+  });
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -42,7 +52,7 @@ export function Agents() {
     }
   };
 
-  const filtered = agents
+  const filtered = mergedAgents
     .filter((a) => {
       if (statusFilter !== 'all' && a.status !== statusFilter) return false;
       if (search) {

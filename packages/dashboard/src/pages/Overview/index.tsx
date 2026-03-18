@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import type { Agent, AgentLog, DashboardSummary } from '@devpigh/shared';
+import type { Agent, AgentLog } from '@devpigh/shared';
 import { api } from '@/api/client';
 import { MetricCard, StatusBadge } from '@/components';
+import { useDashboardSummary } from '@/hooks/useDashboardSummary';
+import { useLogStream } from '@/hooks/useLogStream';
 import styles from './Overview.module.css';
 
 function timeAgo(iso: string): string {
@@ -15,42 +17,37 @@ function timeAgo(iso: string): string {
 }
 
 export function Overview() {
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const { summary, loading, error } = useDashboardSummary();
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [logs, setLogs] = useState<AgentLog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [seedLogs, setSeedLogs] = useState<AgentLog[]>([]);
+  const liveNewLogs = useLogStream();
 
   useEffect(() => {
-    async function load() {
-      try {
-        const [summaryData, agentsData] = await Promise.all([
-          api.dashboard.summary(),
-          api.agents.list(),
-        ]);
-        setSummary(summaryData);
-        setAgents(agentsData);
+    api.agents.list().then(setAgents).catch(() => {});
+  }, []);
 
-        // Fetch recent logs from running/error agents
+  useEffect(() => {
+    async function seedActivity() {
+      try {
+        const agentsData = await api.agents.list();
         const targetAgents = agentsData
           .filter((a) => a.status === 'running' || a.status === 'error')
           .slice(0, 3);
         const logResults = await Promise.all(
           targetAgents.map((a) => api.agents.logs(a.id, 1, 5))
         );
-        const allLogs = logResults.flatMap((r) => r.data);
-        allLogs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-        setLogs(allLogs.slice(0, 10));
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to load');
-      } finally {
-        setLoading(false);
-      }
+        const all = logResults.flatMap((r) => r.data);
+        all.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        setSeedLogs(all.slice(0, 10));
+      } catch { /* ignore */ }
     }
-    load();
-    const interval = setInterval(load, 30000);
-    return () => clearInterval(interval);
+    seedActivity();
   }, []);
+
+  // Merge live logs with seed, dedup by id, keep newest 10
+  const logs = [...liveNewLogs, ...seedLogs]
+    .filter((log, i, arr) => arr.findIndex((l) => l.id === log.id) === i)
+    .slice(0, 10);
 
   if (loading) return <div className={styles.loading}>Loading…</div>;
   if (error) return <div className={styles.error}>{error}</div>;

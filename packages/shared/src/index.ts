@@ -67,3 +67,11 @@ export interface UpdateAgentInput {
 export interface CreateTaskInput {
   input: Record<string, unknown>;
 }
+
+export type {
+  AgentStatusPayload,
+  ServerToClientEvents,
+  ClientToServerEvents,
+  InterServerEvents,
+  SocketData,
+} from './events';

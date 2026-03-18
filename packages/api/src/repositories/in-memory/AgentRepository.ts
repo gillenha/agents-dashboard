@@ -1,9 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
+import type { Server } from 'socket.io';
 import type { Agent, CreateAgentInput, UpdateAgentInput } from '@devpigh/shared';
+import type { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from '@devpigh/shared';
 import type { IAgentRepository } from '../interfaces';
+
+type IO = Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>;
 
 export class InMemoryAgentRepository implements IAgentRepository {
   private agents: Map<string, Agent> = new Map();
+  private io: IO | null = null;
+
+  setIO(io: IO): void {
+    this.io = io;
+  }
 
   async findAll(): Promise<Agent[]> {
     return Array.from(this.agents.values()).sort(
@@ -36,6 +45,13 @@ export class InMemoryAgentRepository implements IAgentRepository {
     if (!existing) return null;
     const updated: Agent = { ...existing, ...input, updatedAt: new Date().toISOString() };
     this.agents.set(id, updated);
+    if (this.io && input.status !== undefined) {
+      this.io.emit('agent:status', {
+        agentId: updated.id,
+        status: updated.status,
+        lastHeartbeat: updated.lastHeartbeat,
+      });
+    }
     return updated;
   }
 
@@ -43,7 +59,6 @@ export class InMemoryAgentRepository implements IAgentRepository {
     return this.agents.delete(id);
   }
 
-  // Used by seed to insert pre-built agents
   _seed(agent: Agent): void {
     this.agents.set(agent.id, agent);
   }

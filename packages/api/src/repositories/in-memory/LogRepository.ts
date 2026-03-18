@@ -1,9 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
+import type { Server } from 'socket.io';
 import type { AgentLog, LogLevel } from '@devpigh/shared';
+import type { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from '@devpigh/shared';
 import type { ILogRepository, PagedResult, PaginationOptions } from '../interfaces';
+
+type IO = Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>;
 
 export class InMemoryLogRepository implements ILogRepository {
   private logs: Map<string, AgentLog> = new Map();
+  private io: IO | null = null;
+
+  setIO(io: IO): void {
+    this.io = io;
+  }
 
   async findByAgentId(
     agentId: string,
@@ -39,6 +48,7 @@ export class InMemoryLogRepository implements ILogRepository {
       metadata,
     };
     this.logs.set(log.id, log);
+    this.io?.emit('log:new', log);
     return log;
   }
 

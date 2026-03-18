@@ -31,6 +31,7 @@ export interface ITaskRepository {
   findAll(opts: PaginationOptions): Promise<PagedResult<Task>>;
   findById(id: string): Promise<Task | null>;
   create(agentId: string, input: CreateTaskInput): Promise<Task>;
+  update(id: string, patch: Partial<Task>): Promise<Task | null>;
   findCompletedSince(since: Date): Promise<Task[]>;
   findSince(since: Date): Promise<Task[]>;
 }

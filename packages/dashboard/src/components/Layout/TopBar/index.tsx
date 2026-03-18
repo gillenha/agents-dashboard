@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useSocket } from '@/contexts/SocketContext';
 import styles from './TopBar.module.css';
 
 export interface TopBarProps {}
@@ -17,10 +18,17 @@ function buildCrumbs(pathname: string) {
   return crumbs;
 }
 
+const STATUS_LABELS = {
+  connected: 'Live',
+  reconnecting: 'Reconnecting',
+  disconnected: 'Disconnected',
+} as const;
+
 export function TopBar(_props: TopBarProps) {
   const location = useLocation();
   const crumbs = buildCrumbs(location.pathname);
   const [time, setTime] = useState(() => new Date().toLocaleTimeString());
+  const { status } = useSocket();
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date().toLocaleTimeString()), 1000);
@@ -42,8 +50,8 @@ export function TopBar(_props: TopBarProps) {
 
       <div className={styles.right}>
         <div className={styles.statusIndicator}>
-          <span className={`${styles.statusDot} ${styles.online}`} />
-          Live
+          <span className={`${styles.statusDot} ${styles[status]}`} />
+          {STATUS_LABELS[status]}
         </div>
         <span className={styles.time}>{time}</span>
       </div>

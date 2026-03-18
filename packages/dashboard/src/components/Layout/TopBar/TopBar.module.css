@@ -53,13 +53,17 @@
   border-radius: var(--radius-circle);
 }
 
-.statusDot.online {
-  background: var(--color-status-success-dot);
-  box-shadow: var(--shadow-dot-online);
+.statusDot.connected {
+  background: var(--color-accent);
+  box-shadow: var(--shadow-dot-accent);
 }
 
-.statusDot.offline {
-  background: var(--color-text-tertiary);
+.statusDot.reconnecting {
+  background: var(--color-status-warn-dot);
+}
+
+.statusDot.disconnected {
+  background: var(--color-status-error-dot);
 }
 
 .time {
