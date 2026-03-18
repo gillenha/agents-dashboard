@@ -68,6 +68,30 @@ export interface CreateTaskInput {
   input: Record<string, unknown>;
 }
 
+// ── Agent-facing API request/response types ───────────────────────────────────
+
+export interface AgentRegisterRequest {
+  name: string;
+  type: string;
+  metadata?: Record<string, unknown>;
+}
+export type AgentRegisterResponse = Agent;
+
+export interface HeartbeatRequest {
+  /** 'busy' maps to the internal 'running' status */
+  status?: 'idle' | 'busy';
+}
+export type HeartbeatResponse = Agent;
+
+export type TaskPollResponse = Task | null;
+
+export interface TaskResultRequest {
+  status: 'completed' | 'failed';
+  result?: Record<string, unknown>;
+  error?: string;
+}
+export type TaskResultResponse = Task;
+
 export type {
   AgentStatusPayload,
   ServerToClientEvents,

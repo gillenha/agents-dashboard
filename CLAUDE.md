@@ -73,6 +73,16 @@
 - Repositories receive Socket.io server via setIO() to emit events on data changes
 - Vite proxy forwards both /api and /socket.io (with ws: true) to port 3001
 
+## Agent API (agent-facing endpoints)
+- Routes in packages/api/src/routes/v1/agentApi.ts, mounted before CRUD router
+- POST /api/v1/agents/register — upsert by name, returns full agent object
+- POST /api/v1/agents/:id/heartbeat — refreshes last_heartbeat, optional status
+- POST /api/v1/agents/:id/tasks/poll — atomic dequeue (FOR UPDATE SKIP LOCKED in postgres), 204 if empty
+- POST /api/v1/agents/:id/tasks/:taskId/result — updates task + resets agent to idle
+- Heartbeat monitor: 30s interval, marks agents offline after 90s no heartbeat, uses repo interface
+- Shared types: AgentRegisterRequest/Response, HeartbeatRequest/Response, TaskPollResponse, TaskResultRequest/Response
+- Repository additions: findByName(name), findStale(olderThan) on IAgentRepository; pollNext(agentId) on ITaskRepository
+
 ## Production / Docker
 - Dockerfile at repo root: multi-stage build (node:20-alpine builder → lean production image)
 - Builder installs all deps, runs `pnpm run build` (shared → api → dashboard)

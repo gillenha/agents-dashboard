@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import type { AgentStatus } from '@devpigh/shared';
 import type { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from '@devpigh/shared';
 import { createRepositories } from './repositories';
+import { agentApiRouter }  from './routes/v1/agentApi';
 import { agentRouter }     from './routes/v1/agents';
 import { taskRouter }      from './routes/v1/tasks';
 import { dashboardRouter } from './routes/v1/dashboard';
@@ -28,7 +29,8 @@ agentRepo.setIO(io);
 taskRepo.setIO(io);
 logRepo.setIO(io);
 
-// Mount routes
+// Mount routes — agent API before CRUD router so /register and /heartbeat match first
+app.use('/api/v1/agents',    agentApiRouter(agentRepo, taskRepo));
 app.use('/api/v1/agents',    agentRouter(agentRepo, taskRepo, logRepo));
 app.use('/api/v1/tasks',     taskRouter(taskRepo));
 app.use('/api/v1/dashboard', dashboardRouter(agentRepo, taskRepo));
@@ -79,6 +81,18 @@ async function broadcastSummary() {
 }
 
 setInterval(() => { broadcastSummary().catch(console.error); }, 5000);
+
+// Heartbeat monitor — runs every 30s, marks agents offline if last_heartbeat > 90s ago
+async function checkHeartbeats() {
+  const staleThreshold = new Date(Date.now() - 90 * 1000);
+  const staleAgents = await agentRepo.findStale(staleThreshold);
+  for (const agent of staleAgents) {
+    await agentRepo.update(agent.id, { status: 'offline' });
+    console.log(`[heartbeat] Agent ${agent.id} (${agent.name}) marked offline`);
+  }
+}
+
+setInterval(() => { checkHeartbeats().catch(console.error); }, 30_000);
 
 server.listen(PORT, () => {
   console.log(`[api] Listening on http://localhost:${PORT}`);

@@ -48,6 +48,22 @@ export class PostgresAgentRepository implements IAgentRepository {
     return result.rows.length > 0 ? mapRow(result.rows[0]) : null;
   }
 
+  async findByName(name: string): Promise<Agent | null> {
+    const result: QueryResult = await this.pool.query(
+      'SELECT * FROM agents WHERE name = $1 LIMIT 1',
+      [name]
+    );
+    return result.rows.length > 0 ? mapRow(result.rows[0]) : null;
+  }
+
+  async findStale(olderThan: Date): Promise<Agent[]> {
+    const result: QueryResult = await this.pool.query(
+      `SELECT * FROM agents WHERE status != 'offline' AND last_heartbeat < $1`,
+      [olderThan.toISOString()]
+    );
+    return result.rows.map(mapRow);
+  }
+
   async create(input: CreateAgentInput): Promise<Agent> {
     const result: QueryResult = await this.pool.query(
       `INSERT INTO agents (name, type, config)
@@ -55,7 +71,13 @@ export class PostgresAgentRepository implements IAgentRepository {
        RETURNING *`,
       [input.name, input.type, JSON.stringify(input.config ?? {})]
     );
-    return mapRow(result.rows[0]);
+    const agent = mapRow(result.rows[0]);
+    this.io?.emit('agent:status', {
+      agentId: agent.id,
+      status:  agent.status,
+      lastHeartbeat: agent.lastHeartbeat,
+    });
+    return agent;
   }
 
   async update(id: string, input: UpdateAgentInput): Promise<Agent | null> {

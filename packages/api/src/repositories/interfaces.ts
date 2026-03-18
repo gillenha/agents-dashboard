@@ -21,6 +21,8 @@ export interface PagedResult<T> {
 export interface IAgentRepository {
   findAll(): Promise<Agent[]>;
   findById(id: string): Promise<Agent | null>;
+  findByName(name: string): Promise<Agent | null>;
+  findStale(olderThan: Date): Promise<Agent[]>;
   create(input: CreateAgentInput): Promise<Agent>;
   update(id: string, input: UpdateAgentInput): Promise<Agent | null>;
   delete(id: string): Promise<boolean>;
@@ -32,6 +34,7 @@ export interface ITaskRepository {
   findById(id: string): Promise<Task | null>;
   create(agentId: string, input: CreateTaskInput): Promise<Task>;
   update(id: string, patch: Partial<Task>): Promise<Task | null>;
+  pollNext(agentId: string): Promise<Task | null>;
   findCompletedSince(since: Date): Promise<Task[]>;
   findSince(since: Date): Promise<Task[]>;
 }

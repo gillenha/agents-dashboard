@@ -59,6 +59,19 @@ export class InMemoryTaskRepository implements ITaskRepository {
     return updated;
   }
 
+  async pollNext(agentId: string): Promise<Task | null> {
+    const queued = Array.from(this.tasks.values())
+      .filter((t) => t.agentId === agentId && t.status === 'queued')
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+    if (queued.length === 0) return null;
+
+    const updated: Task = { ...queued[0], status: 'running', startedAt: new Date().toISOString() };
+    this.tasks.set(updated.id, updated);
+    this.io?.emit('task:update', updated);
+    return updated;
+  }
+
   async findCompletedSince(since: Date): Promise<Task[]> {
     return Array.from(this.tasks.values()).filter(
       (t) => t.status === 'completed' && t.completedAt && new Date(t.completedAt) >= since

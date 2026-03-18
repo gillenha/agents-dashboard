@@ -106,6 +106,26 @@ export class PostgresTaskRepository implements ITaskRepository {
     return task;
   }
 
+  async pollNext(agentId: string): Promise<Task | null> {
+    // Atomically claim the oldest queued task for this agent using FOR UPDATE SKIP LOCKED
+    const result: QueryResult = await this.pool.query(
+      `UPDATE tasks SET status = 'running', started_at = NOW()
+       WHERE id = (
+         SELECT id FROM tasks
+         WHERE agent_id = $1 AND status = 'queued'
+         ORDER BY created_at ASC
+         LIMIT 1
+         FOR UPDATE SKIP LOCKED
+       )
+       RETURNING *`,
+      [agentId]
+    );
+    if (result.rows.length === 0) return null;
+    const task = mapRow(result.rows[0]);
+    this.io?.emit('task:update', task);
+    return task;
+  }
+
   async findCompletedSince(since: Date): Promise<Task[]> {
     const result: QueryResult = await this.pool.query(
       `SELECT * FROM tasks WHERE status = 'completed' AND completed_at >= $1`,

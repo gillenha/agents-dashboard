@@ -24,6 +24,19 @@ export class InMemoryAgentRepository implements IAgentRepository {
     return this.agents.get(id) ?? null;
   }
 
+  async findByName(name: string): Promise<Agent | null> {
+    for (const agent of this.agents.values()) {
+      if (agent.name === name) return agent;
+    }
+    return null;
+  }
+
+  async findStale(olderThan: Date): Promise<Agent[]> {
+    return Array.from(this.agents.values()).filter(
+      (a) => a.status !== 'offline' && new Date(a.lastHeartbeat) < olderThan
+    );
+  }
+
   async create(input: CreateAgentInput): Promise<Agent> {
     const now = new Date().toISOString();
     const agent: Agent = {
@@ -37,6 +50,11 @@ export class InMemoryAgentRepository implements IAgentRepository {
       updatedAt: now,
     };
     this.agents.set(agent.id, agent);
+    this.io?.emit('agent:status', {
+      agentId: agent.id,
+      status:  agent.status,
+      lastHeartbeat: agent.lastHeartbeat,
+    });
     return agent;
   }
 
