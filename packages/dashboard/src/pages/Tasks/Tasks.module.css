@@ -4,13 +4,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6);
 }
 
 .pageTitle {
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-tight);
   color: var(--color-text-primary);
 }
 
@@ -32,11 +32,11 @@ table {
 }
 
 th {
-  padding: 10px 16px;
+  padding: var(--space-2-5) var(--space-4);
   text-align: left;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-table);
   text-transform: uppercase;
   color: var(--color-text-tertiary);
   border-bottom: 1px solid var(--color-border);
@@ -44,8 +44,8 @@ th {
 }
 
 td {
-  padding: 12px 16px;
-  font-size: 13px;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
   color: var(--color-text-primary);
   border-bottom: 1px solid var(--color-border);
   vertical-align: middle;
@@ -56,20 +56,20 @@ tr:last-child td {
 }
 
 tbody tr:hover {
-  background: #f7f7f7;
+  background: var(--color-surface-hover);
 }
 
 .mono {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   color: var(--color-text-tertiary);
 }
 
 .agentLink {
-  font-size: 13px;
+  font-size: var(--font-size-base);
   color: var(--color-accent);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .agentLink:hover {
@@ -77,8 +77,8 @@ tbody tr:hover {
 }
 
 .errorText {
-  font-size: 12px;
-  color: #b91c1c;
+  font-size: var(--font-size-md);
+  color: var(--color-status-error-text);
   max-width: 260px;
   white-space: nowrap;
   overflow: hidden;
@@ -89,30 +89,30 @@ tbody tr:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: var(--space-3) var(--space-4);
   border-top: 1px solid var(--color-border);
-  font-size: 12px;
+  font-size: var(--font-size-md);
   color: var(--color-text-secondary);
 }
 
 .paginationBtns {
   display: flex;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .pageBtn {
-  padding: 4px 10px;
+  padding: var(--space-1) var(--space-2-5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: var(--font-size-md);
   background: var(--color-surface);
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: var(--transition-all);
 }
 
 .pageBtn:hover:not(:disabled) {
-  border-color: #bbb;
+  border-color: var(--color-border-hover);
   color: var(--color-text-primary);
 }
 
@@ -123,14 +123,14 @@ tbody tr:hover {
 
 .loading {
   color: var(--color-text-tertiary);
-  font-size: 13px;
-  padding: 32px;
+  font-size: var(--font-size-base);
+  padding: var(--space-8);
   text-align: center;
 }
 
 .error {
-  color: #b91c1c;
-  font-size: 13px;
-  padding: 32px;
+  color: var(--color-status-error-text);
+  font-size: var(--font-size-base);
+  padding: var(--space-8);
   text-align: center;
 }

@@ -4,35 +4,35 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6);
 }
 
 .pageTitle {
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-tight);
   color: var(--color-text-primary);
 }
 
 .controls {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
 }
 
 .searchInput {
   flex: 1;
   max-width: 280px;
-  height: 34px;
-  padding: 0 12px;
+  height: var(--size-input-height);
+  padding: 0 var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-base);
   color: var(--color-text-primary);
   background: var(--color-surface);
   outline: none;
-  transition: border-color 0.15s;
+  transition: var(--transition-border);
 }
 
 .searchInput::placeholder {
@@ -46,30 +46,30 @@
 .filterGroup {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .filterBtn {
-  padding: 5px 12px;
+  padding: var(--space-1-25) var(--space-3);
   border: 1px solid var(--color-border);
-  border-radius: 100px;
-  font-size: 12px;
-  font-weight: 500;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   background: var(--color-surface);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: var(--transition-all);
 }
 
 .filterBtn:hover {
-  border-color: #bbb;
+  border-color: var(--color-border-hover);
   color: var(--color-text-primary);
 }
 
 .filterBtn.active {
   background: var(--color-text-primary);
   border-color: var(--color-text-primary);
-  color: white;
+  color: var(--color-text-sidebar-active);
 }
 
 .tableCard {
@@ -97,11 +97,11 @@ thead {
 }
 
 th {
-  padding: 10px 16px;
+  padding: var(--space-2-5) var(--space-4);
   text-align: left;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-table);
   text-transform: uppercase;
   color: var(--color-text-tertiary);
   border-bottom: 1px solid var(--color-border);
@@ -116,14 +116,14 @@ th:hover {
 
 .sortIcon {
   display: inline-block;
-  margin-left: 4px;
+  margin-left: var(--space-1);
   opacity: 0.5;
   font-style: normal;
 }
 
 td {
-  padding: 12px 16px;
-  font-size: 13px;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
   color: var(--color-text-primary);
   border-bottom: 1px solid var(--color-border);
   vertical-align: middle;
@@ -134,22 +134,22 @@ tr:last-child td {
 }
 
 tbody tr {
-  transition: background 0.1s;
+  transition: var(--transition-row);
 }
 
 tbody tr:hover {
-  background: #f7f7f7;
+  background: var(--color-surface-hover);
 }
 
 .idCell {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   color: var(--color-text-tertiary);
 }
 
 .nameLink {
   color: var(--color-text-primary);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   text-decoration: none;
 }
 
@@ -159,26 +159,26 @@ tbody tr:hover {
 
 .typeTag {
   display: inline-block;
-  padding: 2px 8px;
+  padding: var(--space-0-5) var(--space-2);
   background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   font-family: var(--font-mono);
 }
 
 .timestamp {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   color: var(--color-text-tertiary);
 }
 
 .actionLink {
-  font-size: 12px;
+  font-size: var(--font-size-md);
   color: var(--color-accent);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .actionLink:hover {
@@ -186,22 +186,22 @@ tbody tr:hover {
 }
 
 .empty {
-  padding: 48px;
+  padding: var(--space-12);
   text-align: center;
   color: var(--color-text-tertiary);
-  font-size: 13px;
+  font-size: var(--font-size-base);
 }
 
 .loading {
   color: var(--color-text-tertiary);
-  font-size: 13px;
-  padding: 32px 0;
+  font-size: var(--font-size-base);
+  padding: var(--space-8) 0;
   text-align: center;
 }
 
 .error {
-  color: #b91c1c;
-  font-size: 13px;
-  padding: 32px 0;
+  color: var(--color-status-error-text);
+  font-size: var(--font-size-base);
+  padding: var(--space-8) 0;
   text-align: center;
 }

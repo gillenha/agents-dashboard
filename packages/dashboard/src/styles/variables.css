@@ -1,0 +1,158 @@
+:root {
+  /* === Colors === */
+
+  /* Core palette */
+  --color-sidebar: #0A0A0A;
+  --color-bg: #FAFAFA;
+  --color-surface: #FFFFFF;
+  --color-accent: #2A9D8F;
+  --color-accent-light: rgba(42, 157, 143, 0.1);
+  --color-accent-glow: rgba(42, 157, 143, 0.3);
+  --color-border: #E5E5E5;
+
+  /* Text hierarchy */
+  --color-text-primary: #111111;
+  --color-text-secondary: #555555;
+  --color-text-tertiary: #999999;
+  --color-text-sidebar: rgba(255, 255, 255, 0.7);
+  --color-text-sidebar-active: #FFFFFF;
+
+  /* Sidebar chrome */
+  --color-sidebar-border: rgba(255, 255, 255, 0.06);
+  --color-sidebar-hover: rgba(255, 255, 255, 0.05);
+  --color-sidebar-active-bg: rgba(255, 255, 255, 0.08);
+  --color-sidebar-section: rgba(255, 255, 255, 0.25);
+  --color-sidebar-sub: rgba(255, 255, 255, 0.35);
+  --color-sidebar-status: rgba(255, 255, 255, 0.3);
+
+  /* Surface states */
+  --color-surface-hover: #f7f7f7;
+  --color-border-hover: #bbb;
+
+  /* Semantic feedback */
+  --color-delta-positive: #16a34a;
+  --color-delta-negative: #dc2626;
+
+  /* Status: running */
+  --color-status-running-bg: rgba(42, 157, 143, 0.1);
+  --color-status-running-text: #1a7a6e;
+  --color-status-running-dot: #2A9D8F;
+
+  /* Status: idle */
+  --color-status-idle-bg: rgba(100, 116, 139, 0.1);
+  --color-status-idle-text: #475569;
+  --color-status-idle-dot: #94a3b8;
+
+  /* Status: error/failed */
+  --color-status-error-bg: rgba(220, 38, 38, 0.08);
+  --color-status-error-text: #b91c1c;
+  --color-status-error-dot: #ef4444;
+
+  /* Status: offline */
+  --color-status-offline-bg: rgba(150, 150, 150, 0.1);
+  --color-status-offline-text: #888888;
+  --color-status-offline-dot: #bbbbbb;
+  --color-status-offline-bar: #d1d5db;
+
+  /* Status: queued/warn */
+  --color-status-warn-bg: rgba(234, 179, 8, 0.1);
+  --color-status-warn-text: #a16207;
+  --color-status-warn-dot: #eab308;
+
+  /* Status: completed/success */
+  --color-status-success-bg: rgba(34, 197, 94, 0.1);
+  --color-status-success-text: #15803d;
+  --color-status-success-dot: #22c55e;
+
+  /* Status: info */
+  --color-status-info-bg: rgba(59, 130, 246, 0.08);
+  --color-status-info-text: #1d4ed8;
+  --color-status-info-dot: #3b82f6;
+
+  /* === Typography === */
+
+  /* Font families */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* Font sizes */
+  --font-size-xs: 10px;
+  --font-size-sm: 11px;
+  --font-size-md: 12px;
+  --font-size-base: 13px;
+  --font-size-body: 14px;
+  --font-size-lg: 20px;
+  --font-size-xl: 28px;
+
+  /* Font weights */
+  --font-weight-nav: 450;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Letter spacing */
+  --tracking-tight: -0.02em;
+  --tracking-badge: 0.02em;
+  --tracking-logo-sub: 0.04em;
+  --tracking-card: 0.05em;
+  --tracking-table: 0.06em;
+  --tracking-logo: 0.08em;
+  --tracking-section: 0.1em;
+
+  /* Line heights */
+  --line-height-tight: 1;
+  --line-height-body: 1.5;
+  --line-height-relaxed: 1.7;
+
+  /* === Spacing (4px base scale) === */
+
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-25: 5px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-2-5: 10px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* === Component Sizes === */
+
+  --size-nav-icon: 16px;
+  --size-status-dot: 6px;
+  --size-topbar-dot: 7px;
+  --size-status-bar: 4px;
+  --size-input-height: 34px;
+
+  /* === Shadows === */
+
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 2px 8px rgba(0, 0, 0, 0.12);
+  --shadow-dot-accent: 0 0 0 2px rgba(42, 157, 143, 0.3);
+  --shadow-dot-online: 0 0 0 2px rgba(34, 197, 94, 0.2);
+
+  /* === Border Radius === */
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 100px;
+  --radius-circle: 50%;
+
+  /* === Layout === */
+
+  --sidebar-width: 240px;
+  --topbar-height: 52px;
+
+  /* === Transitions === */
+
+  --transition-nav: color 0.15s, background 0.15s;
+  --transition-color: color 0.15s;
+  --transition-border: border-color 0.15s;
+  --transition-all: all 0.15s;
+  --transition-row: background 0.1s;
+  --transition-width: width 0.4s ease;
+}

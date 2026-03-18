@@ -1,75 +1,75 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 2px 8px;
-  border-radius: 100px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  gap: var(--space-1-25);
+  padding: var(--space-0-5) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-badge);
   white-space: nowrap;
 }
 
 .dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
+  width: var(--space-1-25);
+  height: var(--space-1-25);
+  border-radius: var(--radius-circle);
   flex-shrink: 0;
 }
 
 /* Agent statuses */
 .running {
-  background: rgba(42, 157, 143, 0.1);
-  color: #1a7a6e;
+  background: var(--color-status-running-bg);
+  color: var(--color-status-running-text);
 }
-.running .dot { background: #2A9D8F; }
+.running .dot { background: var(--color-status-running-dot); }
 
 .idle {
-  background: rgba(100, 116, 139, 0.1);
-  color: #475569;
+  background: var(--color-status-idle-bg);
+  color: var(--color-status-idle-text);
 }
-.idle .dot { background: #94a3b8; }
+.idle .dot { background: var(--color-status-idle-dot); }
 
 .error {
-  background: rgba(220, 38, 38, 0.08);
-  color: #b91c1c;
+  background: var(--color-status-error-bg);
+  color: var(--color-status-error-text);
 }
-.error .dot { background: #ef4444; }
+.error .dot { background: var(--color-status-error-dot); }
 
 .offline {
-  background: rgba(150, 150, 150, 0.1);
-  color: #888;
+  background: var(--color-status-offline-bg);
+  color: var(--color-status-offline-text);
 }
-.offline .dot { background: #bbb; }
+.offline .dot { background: var(--color-status-offline-dot); }
 
 /* Task statuses */
 .queued {
-  background: rgba(234, 179, 8, 0.1);
-  color: #a16207;
+  background: var(--color-status-warn-bg);
+  color: var(--color-status-warn-text);
 }
-.queued .dot { background: #eab308; }
+.queued .dot { background: var(--color-status-warn-dot); }
 
 .completed {
-  background: rgba(34, 197, 94, 0.1);
-  color: #15803d;
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success-text);
 }
-.completed .dot { background: #22c55e; }
+.completed .dot { background: var(--color-status-success-dot); }
 
 .failed {
-  background: rgba(220, 38, 38, 0.08);
-  color: #b91c1c;
+  background: var(--color-status-error-bg);
+  color: var(--color-status-error-text);
 }
-.failed .dot { background: #ef4444; }
+.failed .dot { background: var(--color-status-error-dot); }
 
 /* Log levels */
 .info {
-  background: rgba(59, 130, 246, 0.08);
-  color: #1d4ed8;
+  background: var(--color-status-info-bg);
+  color: var(--color-status-info-text);
 }
-.info .dot { background: #3b82f6; }
+.info .dot { background: var(--color-status-info-dot); }
 
 .warn {
-  background: rgba(234, 179, 8, 0.1);
-  color: #a16207;
+  background: var(--color-status-warn-bg);
+  color: var(--color-status-warn-text);
 }
-.warn .dot { background: #eab308; }
+.warn .dot { background: var(--color-status-warn-dot); }

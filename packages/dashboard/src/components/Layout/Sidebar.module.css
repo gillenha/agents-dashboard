@@ -16,53 +16,53 @@
   height: var(--topbar-height);
   display: flex;
   align-items: center;
-  padding: 0 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 0 var(--space-5);
+  border-bottom: 1px solid var(--color-sidebar-border);
 }
 
 .logoMark {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-logo);
   text-transform: uppercase;
-  color: #FFFFFF;
+  color: var(--color-text-sidebar-active);
 }
 
 .logoSub {
-  font-size: 11px;
-  color: rgba(255,255,255,0.35);
-  margin-left: 8px;
-  letter-spacing: 0.04em;
+  font-size: var(--font-size-sm);
+  color: var(--color-sidebar-sub);
+  margin-left: var(--space-2);
+  letter-spacing: var(--tracking-logo-sub);
 }
 
 .nav {
   flex: 1;
-  padding: 12px 0;
+  padding: var(--space-3) 0;
   overflow-y: auto;
 }
 
 .section {
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 
 .sectionLabel {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-section);
   text-transform: uppercase;
-  color: rgba(255,255,255,0.25);
-  padding: 8px 20px 4px;
+  color: var(--color-sidebar-section);
+  padding: var(--space-2) var(--space-5) var(--space-1);
 }
 
 .navItem {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 20px;
-  font-size: 13px;
-  font-weight: 450;
+  gap: var(--space-2-5);
+  padding: var(--space-2) var(--space-5);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-nav);
   color: var(--color-text-sidebar);
-  transition: color 0.15s, background 0.15s;
+  transition: var(--transition-nav);
   border-radius: 0;
   cursor: pointer;
   text-decoration: none;
@@ -70,12 +70,12 @@
 
 .navItem:hover {
   color: var(--color-text-sidebar-active);
-  background: rgba(255,255,255,0.05);
+  background: var(--color-sidebar-hover);
 }
 
 .navItem.active {
   color: var(--color-text-sidebar-active);
-  background: rgba(255,255,255,0.08);
+  background: var(--color-sidebar-active-bg);
   position: relative;
 }
 
@@ -83,16 +83,16 @@
   content: '';
   position: absolute;
   left: 0;
-  top: 4px;
-  bottom: 4px;
-  width: 2px;
+  top: var(--space-1);
+  bottom: var(--space-1);
+  width: var(--space-0-5);
   background: var(--color-accent);
-  border-radius: 0 2px 2px 0;
+  border-radius: 0 var(--space-0-5) var(--space-0-5) 0;
 }
 
 .navIcon {
-  width: 16px;
-  height: 16px;
+  width: var(--size-nav-icon);
+  height: var(--size-nav-icon);
   opacity: 0.7;
   flex-shrink: 0;
 }
@@ -103,22 +103,22 @@
 }
 
 .footer {
-  padding: 16px 20px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-sidebar-border);
 }
 
 .statusDot {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: rgba(255,255,255,0.3);
+  gap: var(--space-1-5);
+  font-size: var(--font-size-sm);
+  color: var(--color-sidebar-status);
 }
 
 .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+  width: var(--size-status-dot);
+  height: var(--size-status-dot);
+  border-radius: var(--radius-circle);
   background: var(--color-accent);
-  box-shadow: 0 0 0 2px rgba(42, 157, 143, 0.3);
+  box-shadow: var(--shadow-dot-accent);
 }
