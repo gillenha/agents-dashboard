@@ -4,18 +4,15 @@ import cors from 'cors';
 import { Server } from 'socket.io';
 import type { AgentStatus } from '@devpigh/shared';
 import type { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from '@devpigh/shared';
-import { InMemoryAgentRepository } from './repositories/in-memory/AgentRepository';
-import { InMemoryTaskRepository } from './repositories/in-memory/TaskRepository';
-import { InMemoryLogRepository } from './repositories/in-memory/LogRepository';
-import { agentRouter } from './routes/v1/agents';
-import { taskRouter } from './routes/v1/tasks';
+import { createRepositories } from './repositories';
+import { agentRouter }     from './routes/v1/agents';
+import { taskRouter }      from './routes/v1/tasks';
 import { dashboardRouter } from './routes/v1/dashboard';
-import { seedStore } from './seed';
 import { startSimulation } from './simulation';
 
-const app = express();
+const app    = express();
 const server = http.createServer(app);
-const PORT = process.env.PORT ?? 3001;
+const PORT   = process.env.PORT ?? 3001;
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(server, {
   cors: { origin: '*' },
@@ -24,21 +21,15 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
 app.use(cors());
 app.use(express.json());
 
-// Instantiate repositories and wire up socket.io
-const agentRepo = new InMemoryAgentRepository();
-const taskRepo = new InMemoryTaskRepository();
-const logRepo = new InMemoryLogRepository();
-
+// Composition root — picks postgres or in-memory based on USE_DB env var
+const { agentRepo, taskRepo, logRepo } = createRepositories();
 agentRepo.setIO(io);
 taskRepo.setIO(io);
 logRepo.setIO(io);
 
-// Seed in-memory store
-seedStore(agentRepo, taskRepo, logRepo);
-
 // Mount routes
-app.use('/api/v1/agents', agentRouter(agentRepo, taskRepo, logRepo));
-app.use('/api/v1/tasks', taskRouter(taskRepo));
+app.use('/api/v1/agents',    agentRouter(agentRepo, taskRepo, logRepo));
+app.use('/api/v1/tasks',     taskRouter(taskRepo));
 app.use('/api/v1/dashboard', dashboardRouter(agentRepo, taskRepo));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
@@ -47,17 +38,9 @@ app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 io.on('connection', (socket) => {
   console.log(`[ws] Client connected: ${socket.id}`);
 
-  socket.on('agent:subscribe', ({ agentId }) => {
-    socket.join(`agent:${agentId}`);
-  });
-
-  socket.on('agent:unsubscribe', ({ agentId }) => {
-    socket.leave(`agent:${agentId}`);
-  });
-
-  socket.on('disconnect', () => {
-    console.log(`[ws] Client disconnected: ${socket.id}`);
-  });
+  socket.on('agent:subscribe',   ({ agentId }) => socket.join(`agent:${agentId}`));
+  socket.on('agent:unsubscribe', ({ agentId }) => socket.leave(`agent:${agentId}`));
+  socket.on('disconnect', () => console.log(`[ws] Client disconnected: ${socket.id}`));
 });
 
 // Broadcast dashboard summary every 5 seconds
@@ -74,7 +57,7 @@ async function broadcastSummary() {
   }
 
   const failedLast24h = allLast24h.filter((t) => t.status === 'failed').length;
-  const errorRate = allLast24h.length > 0 ? failedLast24h / allLast24h.length : 0;
+  const errorRate     = allLast24h.length > 0 ? failedLast24h / allLast24h.length : 0;
 
   io.emit('dashboard:summary', {
     totalAgents: agents.length,

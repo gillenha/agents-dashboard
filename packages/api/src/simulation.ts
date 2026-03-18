@@ -1,7 +1,5 @@
 import type { AgentStatus, LogLevel } from '@devpigh/shared';
-import type { InMemoryAgentRepository } from './repositories/in-memory/AgentRepository';
-import type { InMemoryTaskRepository } from './repositories/in-memory/TaskRepository';
-import type { InMemoryLogRepository } from './repositories/in-memory/LogRepository';
+import type { IAgentRepository, ILogRepository, ITaskRepository } from './repositories/interfaces';
 
 const LOG_MESSAGES: Record<AgentStatus, { level: LogLevel; messages: string[] }[]> = {
   running: [
@@ -13,7 +11,7 @@ const LOG_MESSAGES: Record<AgentStatus, { level: LogLevel; messages: string[] }[
   ],
   error: [
     { level: 'error', messages: ['Unhandled exception caught', 'Connection refused', 'Task execution failed'] },
-    { level: 'warn', messages: ['Attempting recovery', 'Backing off before retry'] },
+    { level: 'warn',  messages: ['Attempting recovery', 'Backing off before retry'] },
   ],
   offline: [
     { level: 'warn', messages: ['Heartbeat missed', 'Agent unreachable'] },
@@ -29,9 +27,9 @@ function pick<T>(arr: T[]): T {
 }
 
 export function startSimulation(
-  agentRepo: InMemoryAgentRepository,
-  taskRepo: InMemoryTaskRepository,
-  logRepo: InMemoryLogRepository
+  agentRepo: IAgentRepository,
+  taskRepo:  ITaskRepository,
+  logRepo:   ILogRepository
 ): void {
   async function tick() {
     const agents = await agentRepo.findAll();
@@ -40,7 +38,6 @@ export function startSimulation(
     const action = randomInt(0, 2);
 
     if (action === 0) {
-      // Toggle an agent between running/idle
       const candidates = agents.filter((a) => a.status === 'running' || a.status === 'idle');
       if (candidates.length > 0) {
         const agent = pick(candidates);
@@ -51,34 +48,32 @@ export function startSimulation(
         });
       }
     } else if (action === 1) {
-      // Advance a task: queued→running, running→completed/failed
       const allTasks = await taskRepo.findAll({ page: 1, limit: 100 });
-      const queued = allTasks.data.filter((t) => t.status === 'queued');
+      const queued  = allTasks.data.filter((t) => t.status === 'queued');
       const running = allTasks.data.filter((t) => t.status === 'running');
 
       if (queued.length > 0) {
         const task = pick(queued);
         await taskRepo.update(task.id, {
-          status: 'running',
+          status:    'running',
           startedAt: new Date().toISOString(),
         });
       } else if (running.length > 0) {
-        const task = pick(running);
+        const task    = pick(running);
         const succeed = Math.random() > 0.2;
         await taskRepo.update(task.id, {
-          status: succeed ? 'completed' : 'failed',
+          status:      succeed ? 'completed' : 'failed',
           completedAt: new Date().toISOString(),
-          output: succeed ? { rowsProcessed: randomInt(100, 5000) } : null,
-          error: succeed ? null : 'Simulation: task failed unexpectedly',
+          output:      succeed ? { rowsProcessed: randomInt(100, 5000) } : null,
+          error:       succeed ? null : 'Simulation: task failed unexpectedly',
         });
       }
     } else {
-      // Create a new log entry for a random active agent
       const active = agents.filter((a) => a.status !== 'offline');
       if (active.length > 0) {
-        const agent = pick(active);
+        const agent   = pick(active);
         const options = LOG_MESSAGES[agent.status];
-        const group = pick(options);
+        const group   = pick(options);
         const message = pick(group.messages);
         await logRepo.create(agent.id, group.level, message, { simulated: true });
       }

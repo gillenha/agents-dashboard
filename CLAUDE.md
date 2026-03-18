@@ -50,6 +50,22 @@
 - useDashboardSummary() — REST seed + WebSocket live updates
 - All hooks in packages/dashboard/src/hooks/
 
+## Database
+- PostgreSQL 16 via Docker Compose (docker-compose.yml at root)
+- Connection pool in packages/api/src/db/pool.ts (reads DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
+- Schema: packages/api/src/db/schema.sql | Seed: packages/api/src/db/seed.sql
+- Postgres repos in packages/api/src/repositories/postgres/
+- In-memory repos still in packages/api/src/repositories/in-memory/
+- Composition root: packages/api/src/repositories/index.ts — USE_DB env var (default: "postgres", fallback: "memory")
+- simulation.ts uses repository interfaces, works with both backends
+
+## Dev Commands
+- pnpm dev — starts API (3001) + dashboard (5173)
+- pnpm db:up / db:down — start/stop postgres container
+- pnpm db:init — run schema + seed
+- pnpm db:reset — full teardown and reseed
+- USE_DB=memory pnpm --filter api dev — bypass postgres
+
 ## API Patterns
 - All routes versioned under /api/v1/
 - Data access only through repository interfaces (never direct store access in routes)
