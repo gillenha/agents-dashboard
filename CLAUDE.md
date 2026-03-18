@@ -105,6 +105,21 @@
   - psql: `brew install libpq` (adds psql without full Postgres)
 - Full setup reference: `infra/gcp-setup.sh` (read section by section — not a blind-run script)
 
+## CI / CD
+- Pipeline config: `cloudbuild.yaml` at repo root — triggered on every push to `main`
+- Step 1 **build**: `docker buildx build --platform linux/amd64 --load` — tags `:$COMMIT_SHA` and `:latest`
+- Step 2 **push**: pushes both tags to Artifact Registry (`--all-tags`)
+- Step 3 **deploy**: `gcloud run deploy` using the immutable `:$COMMIT_SHA` tag (never `:latest` for deploys)
+- Substitution variable defaults (override per-trigger or per-manual-run):
+  - `_REGION`: us-east1
+  - `_SERVICE_NAME`: devpigh
+  - `_INSTANCE_CONNECTION_NAME`: harry-gillen-builder:us-east1:devpigh-db
+  - `_REPO`: devpigh/dashboard (full registry path: `us-east1-docker.pkg.dev/$PROJECT_ID/$_REPO`)
+- Trigger setup: `infra/setup-trigger.sh` — requires one-time GitHub OAuth in GCP console before running
+- Trigger manually: `gcloud builds submit --config cloudbuild.yaml .`
+- View build logs: GCP console → Cloud Build → History, or `gcloud builds list --region=us-east1`
+- Cloud Build SA needs `roles/run.admin` and `roles/iam.serviceAccountUser` on `devpigh-runner` to deploy
+
 ## Commands
 - `pnpm dev` — starts both API (3001) and dashboard (5173)
 - `pnpm --filter api dev` / `pnpm --filter dashboard dev` — individual

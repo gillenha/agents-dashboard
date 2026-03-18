@@ -1,0 +1,57 @@
+substitutions:
+  _REGION: us-east1
+  _SERVICE_NAME: devpigh
+  _INSTANCE_CONNECTION_NAME: harry-gillen-builder:us-east1:devpigh-db
+  # Image path within Artifact Registry (no registry host — compose as us-east1-docker.pkg.dev/$PROJECT_ID/$_REPO)
+  _REPO: devpigh/dashboard
+
+steps:
+  # ── Step 1: Build ────────────────────────────────────────────────────────────
+  # Build for linux/amd64 (Cloud Run requires amd64; --load makes it available
+  # to the local Docker daemon so the push step can access it)
+  - name: gcr.io/cloud-builders/docker
+    id: build
+    args:
+      - buildx
+      - build
+      - --platform=linux/amd64
+      - --load
+      - -t
+      - us-east1-docker.pkg.dev/$PROJECT_ID/$_REPO:$COMMIT_SHA
+      - -t
+      - us-east1-docker.pkg.dev/$PROJECT_ID/$_REPO:latest
+      - .
+
+  # ── Step 2: Push ─────────────────────────────────────────────────────────────
+  # Push both tags to Artifact Registry
+  - name: gcr.io/cloud-builders/docker
+    id: push
+    args:
+      - push
+      - --all-tags
+      - us-east1-docker.pkg.dev/$PROJECT_ID/$_REPO
+    waitFor: [build]
+
+  # ── Step 3: Deploy ───────────────────────────────────────────────────────────
+  # Deploy the immutable :$COMMIT_SHA tag to Cloud Run (never :latest in deploys)
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: deploy
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - $_SERVICE_NAME
+      - --image=us-east1-docker.pkg.dev/$PROJECT_ID/$_REPO:$COMMIT_SHA
+      - --region=$_REGION
+      - --platform=managed
+      - --service-account=devpigh-runner@$PROJECT_ID.iam.gserviceaccount.com
+      - --add-cloudsql-instances=$_INSTANCE_CONNECTION_NAME
+      - --set-env-vars=DB_USER=devpigh,DB_NAME=devpigh,DB_HOST=/cloudsql/$_INSTANCE_CONNECTION_NAME,USE_DB=postgres
+      - --set-secrets=DB_PASSWORD=devpigh-db-password:latest
+      - --allow-unauthenticated
+      - --min-instances=0
+      - --max-instances=1
+    waitFor: [push]
+
+options:
+  logging: CLOUD_LOGGING_ONLY
