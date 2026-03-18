@@ -73,6 +73,38 @@
 - Repositories receive Socket.io server via setIO() to emit events on data changes
 - Vite proxy forwards both /api and /socket.io (with ws: true) to port 3001
 
+## Production / Docker
+- Dockerfile at repo root: multi-stage build (node:20-alpine builder → lean production image)
+- Builder installs all deps, runs `pnpm run build` (shared → api → dashboard)
+- Production stage: prod deps only for api, copies compiled dist artifacts
+- `NODE_ENV=production` causes Express to serve `packages/dashboard/dist` via express.static
+- Catch-all GET route returns `index.html` for client-side routing (after all /api routes)
+- Static files path resolved via `path.join(__dirname, '../../dashboard/dist')` from api dist
+- Port: 8080 (Cloud Run default, set via PORT env var)
+- Cloud SQL Unix socket: if `DB_HOST` starts with `/`, pool omits the port (node-postgres handles natively)
+- `.dockerignore` excludes node_modules, dist, .env files — does NOT exclude packages/*/src/ (builder stage needs source to compile)
+- Cross-platform build (required on M-series Macs — arm64 by default, Cloud Run needs amd64):
+  `docker buildx build --platform linux/amd64 -t devpigh --load .`
+- buildx requires `"cliPluginsExtraDirs": ["/opt/homebrew/lib/docker/cli-plugins"]` in `~/.docker/config.json`
+- Run locally: `docker run -p 8080:8080 -e DB_HOST=... -e DB_USER=... -e DB_PASSWORD=... -e DB_NAME=... devpigh`
+
+## GCP Infrastructure
+- Stack: Cloud Run (service) + Cloud SQL Postgres 16 (devpigh-db, us-east1) + Artifact Registry (devpigh repo) + Cloud Build (CI) + Secret Manager
+- Cloud SQL instance connection name: `harry-gillen-builder:us-east1:devpigh-db`
+- Cloud Run connects via Unix socket: `DB_HOST=/cloudsql/harry-gillen-builder:us-east1:devpigh-db`
+- Service account: `devpigh-runner@harry-gillen-builder.iam.gserviceaccount.com`
+  - roles/cloudsql.client — Unix socket access to Cloud SQL
+  - roles/run.invoker — invoke other Cloud Run services
+  - roles/secretmanager.secretAccessor — read DB password secret
+- Cloud SQL created with `--assign-ip --edition=enterprise` (not `--no-assign-ip`; private-only IP requires VPC peering which isn't set up)
+- Cloud Run reserves the `PORT` env var — do NOT include it in `--set-env-vars` (causes deploy error)
+- Service URL: https://devpigh-368754647823.us-east1.run.app
+- DB password stored in Secret Manager as `devpigh-db-password`, mounted via `--set-secrets`
+- Local Cloud SQL access: Cloud SQL Auth Proxy on localhost:5432, then psql normally
+  - Prerequisite: `gcloud auth application-default login` before first proxy use
+  - psql: `brew install libpq` (adds psql without full Postgres)
+- Full setup reference: `infra/gcp-setup.sh` (read section by section — not a blind-run script)
+
 ## Commands
 - `pnpm dev` — starts both API (3001) and dashboard (5173)
 - `pnpm --filter api dev` / `pnpm --filter dashboard dev` — individual

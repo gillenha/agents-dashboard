@@ -1,9 +1,20 @@
-import { Pool } from 'pg';
+import { Pool, PoolConfig } from 'pg';
 
-export const pool = new Pool({
-  host:     process.env.DB_HOST     ?? 'localhost',
-  port:     parseInt(process.env.DB_PORT ?? '5432', 10),
-  user:     process.env.DB_USER     ?? 'devpigh_admin',
-  password: process.env.DB_PASSWORD ?? 'fatmanpiggy',
-  database: process.env.DB_NAME     ?? 'devpigh',
-});
+const dbHost = process.env.DB_HOST;
+const isUnixSocket = dbHost?.startsWith('/');
+
+const config: PoolConfig = {
+  user:     process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+};
+
+if (isUnixSocket) {
+  // Cloud SQL Unix socket (Cloud Run): host is a socket path, no port
+  config.host = dbHost;
+} else {
+  config.host = dbHost ?? 'localhost';
+  config.port = parseInt(process.env.DB_PORT ?? '5432', 10);
+}
+
+export const pool = new Pool(config);

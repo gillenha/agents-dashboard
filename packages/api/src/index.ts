@@ -1,4 +1,5 @@
 import http from 'http';
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import { Server } from 'socket.io';
@@ -33,6 +34,15 @@ app.use('/api/v1/tasks',     taskRouter(taskRepo));
 app.use('/api/v1/dashboard', dashboardRouter(agentRepo, taskRepo));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+
+// Serve dashboard static files in production
+if (process.env.NODE_ENV === 'production') {
+  const dashboardDist = path.join(__dirname, '../../dashboard/dist');
+  app.use(express.static(dashboardDist));
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(dashboardDist, 'index.html'));
+  });
+}
 
 // Socket.io connection handling
 io.on('connection', (socket) => {

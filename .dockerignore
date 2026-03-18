@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+**/.turbo
+**/.cache
+
+.git
+.gitignore
+
+docker-compose.yml
+*.md
+
+.env
+.env.*
