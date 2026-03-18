@@ -23,9 +23,12 @@
 
 ## CSS Rules
 - CSS Modules only. No inline styles. No global styles except variables and resets.
-- All color values come from CSS custom properties defined in src/styles/variables.css
-- Never hardcode hex values in component CSS files
-- Spacing scale: 4px increments (4, 8, 12, 16, 24, 32, 48)
+- All design tokens defined in src/styles/variables.css (120+ custom properties)
+- Global resets in src/styles/reset.css
+- Both imported in main.tsx before any other styles
+- NEVER hardcode hex values, px font sizes, spacing, shadows, or border-radius in .module.css files — always use var()
+- Spacing scale: --space-0-5 (2px) through --space-12 (48px) in 4px increments
+- Color tokens organized by role: sidebar, surface, accent, border, text hierarchy, status badges
 
 ## API Patterns
 - All routes versioned under /api/v1/

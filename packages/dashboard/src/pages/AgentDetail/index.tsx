@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { Agent, AgentLog, LogLevel, PaginatedResponse, Task } from '@devpigh/shared';
-import { api } from '../../api/client';
-import { StatusBadge } from '../../components/StatusBadge/StatusBadge';
+import { api } from '@/api/client';
+import { StatusBadge } from '@/components';
 import styles from './AgentDetail.module.css';
 
 type Tab = 'overview' | 'tasks' | 'logs' | 'config';

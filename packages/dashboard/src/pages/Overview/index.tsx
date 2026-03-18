@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Agent, AgentLog, DashboardSummary } from '@devpigh/shared';
-import { api } from '../../api/client';
-import { MetricCard } from '../../components/MetricCard/MetricCard';
-import { StatusBadge } from '../../components/StatusBadge/StatusBadge';
+import { api } from '@/api/client';
+import { MetricCard, StatusBadge } from '@/components';
 import styles from './Overview.module.css';
 
 function timeAgo(iso: string): string {

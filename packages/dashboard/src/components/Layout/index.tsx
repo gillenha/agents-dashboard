@@ -3,7 +3,9 @@ import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import styles from './Layout.module.css';
 
-export function Layout() {
+export interface LayoutProps {}
+
+export function Layout(_props: LayoutProps) {
   return (
     <div className={styles.root}>
       <Sidebar />

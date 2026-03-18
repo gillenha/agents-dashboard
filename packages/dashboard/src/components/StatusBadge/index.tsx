@@ -5,11 +5,11 @@ type Status =
   | 'queued' | 'completed' | 'failed'
   | 'info' | 'warn';
 
-interface Props {
+export interface StatusBadgeProps {
   status: Status;
 }
 
-export function StatusBadge({ status }: Props) {
+export function StatusBadge({ status }: StatusBadgeProps) {
   return (
     <span className={`${styles.badge} ${styles[status]}`}>
       <span className={styles.dot} />

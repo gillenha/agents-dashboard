@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Agent, PaginatedResponse, Task } from '@devpigh/shared';
-import { api } from '../../api/client';
-import { StatusBadge } from '../../components/StatusBadge/StatusBadge';
+import { api } from '@/api/client';
+import { StatusBadge } from '@/components';
 import styles from './Tasks.module.css';
 
 function formatDate(iso: string | null): string {

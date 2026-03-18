@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './TopBar.module.css';
 
+export interface TopBarProps {}
+
 function buildCrumbs(pathname: string) {
   const parts = pathname.split('/').filter(Boolean);
   const crumbs: { label: string; path: string }[] = [{ label: 'devpigh', path: '/' }];
@@ -15,7 +17,7 @@ function buildCrumbs(pathname: string) {
   return crumbs;
 }
 
-export function TopBar() {
+export function TopBar(_props: TopBarProps) {
   const location = useLocation();
   const crumbs = buildCrumbs(location.pathname);
   const [time, setTime] = useState(() => new Date().toLocaleTimeString());

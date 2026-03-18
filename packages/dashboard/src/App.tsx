@@ -1,9 +1,9 @@
 import { Routes, Route } from 'react-router-dom';
-import { Layout } from './components/Layout/Layout';
-import { Overview } from './pages/Overview/Overview';
-import { Agents } from './pages/Agents/Agents';
-import { AgentDetail } from './pages/AgentDetail/AgentDetail';
-import { Tasks } from './pages/Tasks/Tasks';
+import { Layout } from '@/components';
+import { Overview } from '@/pages/Overview';
+import { Agents } from '@/pages/Agents';
+import { AgentDetail } from '@/pages/AgentDetail';
+import { Tasks } from '@/pages/Tasks';
 
 export default function App() {
   return (

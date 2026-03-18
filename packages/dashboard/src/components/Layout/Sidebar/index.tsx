@@ -1,6 +1,8 @@
 import { NavLink } from 'react-router-dom';
 import styles from './Sidebar.module.css';
 
+export interface SidebarProps {}
+
 const navItems = [
   {
     label: 'Overview',
@@ -35,7 +37,7 @@ const navItems = [
   },
 ];
 
-export function Sidebar() {
+export function Sidebar(_props: SidebarProps) {
   return (
     <nav className={styles.sidebar}>
       <div className={styles.logo}>

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Agent, AgentStatus } from '@devpigh/shared';
-import { api } from '../../api/client';
-import { StatusBadge } from '../../components/StatusBadge/StatusBadge';
+import { api } from '@/api/client';
+import { StatusBadge } from '@/components';
 import styles from './Agents.module.css';
 
 type SortKey = 'name' | 'status' | 'type' | 'lastHeartbeat' | 'createdAt';
