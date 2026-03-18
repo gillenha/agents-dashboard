@@ -1,0 +1,16 @@
+{
+  "name": "devpigh",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "concurrently --names api,dashboard --prefix-colors cyan,magenta \"pnpm --filter api dev\" \"pnpm --filter dashboard dev\"",
+    "build": "pnpm --filter shared build && pnpm --filter api build && pnpm --filter dashboard build",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
+}
