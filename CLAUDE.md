@@ -83,6 +83,15 @@
 - Shared types: AgentRegisterRequest/Response, HeartbeatRequest/Response, TaskPollResponse, TaskResultRequest/Response
 - Repository additions: findByName(name), findStale(olderThan) on IAgentRepository; pollNext(agentId) on ITaskRepository
 
+## Agent SDK (packages/agent-sdk/)
+- Python package: devpigh-agent (pip-installable from local path)
+- DevpighAgent ABC: auto-registers, heartbeat thread (30s), task poll loop (5s idle sleep)
+- Heartbeat sends "busy" during process_task via threading.Event flag
+- Subclasses implement process_task(task) -> dict
+- DevpighClient: retry 3x with backoff on 5xx/connection errors, no retry on 4xx
+- Config via env vars: DEVPIGH_API_URL, DEVPIGH_AGENT_NAME, DEVPIGH_AGENT_TYPE
+- SIGINT/SIGTERM: sets stop event, poll loop exits next iteration
+
 ## Production / Docker
 - Dockerfile at repo root: multi-stage build (node:20-alpine builder → lean production image)
 - Builder installs all deps, runs `pnpm run build` (shared → api → dashboard)
