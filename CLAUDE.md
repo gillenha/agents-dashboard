@@ -92,6 +92,14 @@
 - Config via env vars: DEVPIGH_API_URL, DEVPIGH_AGENT_NAME, DEVPIGH_AGENT_TYPE
 - SIGINT/SIGTERM: sets stop event, poll loop exits next iteration
 
+## Health Checker Agent (agents/health-checker/)
+- First agent, subclasses DevpighAgent from packages/agent-sdk
+- Processes tasks with input: { urls: string[] }
+- Returns: { results: [{ url, status_code, response_time_ms, healthy }] }
+- Dockerfile builds from repo root: docker build -f agents/health-checker/Dockerfile -t health-checker .
+- Cloud Run: needs --min-instances=1 (persistent poll loop, can't scale to zero)
+- Task creation: POST /api/v1/agents/:id/tasks with { title, input }
+
 ## Production / Docker
 - Dockerfile at repo root: multi-stage build (node:20-alpine builder → lean production image)
 - Builder installs all deps, runs `pnpm run build` (shared → api → dashboard)
