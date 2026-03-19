@@ -24,6 +24,7 @@ export function agentApiRouter(
       });
       return res.json(updated);
     }
+    
     const agent = await agentRepo.create({ name, type, status: 'idle', config: metadata });
     res.status(201).json(agent);
   });

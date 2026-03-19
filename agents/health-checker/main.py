@@ -20,7 +20,10 @@ Task result schema:
     }
 """
 import logging
+import os
+import threading
 import time
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 import requests
 from requests.exceptions import ConnectionError as RequestsConnectionError
@@ -35,6 +38,15 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+
+    def log_message(self, *args):
+        pass
 
 
 class HealthCheckerAgent(DevpighAgent):
@@ -84,5 +96,10 @@ class HealthCheckerAgent(DevpighAgent):
 
 
 if __name__ == "__main__":
+    # Cloud Run requires an HTTP port to pass startup health checks
+    port = int(os.environ.get("PORT", 8080))
+    server = HTTPServer(("", port), HealthHandler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+
     agent = HealthCheckerAgent()
     agent.run()
