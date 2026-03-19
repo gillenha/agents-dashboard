@@ -46,7 +46,7 @@ steps:
       - --platform=managed
       - --service-account=devpigh-runner@$PROJECT_ID.iam.gserviceaccount.com
       - --add-cloudsql-instances=$_INSTANCE_CONNECTION_NAME
-      - --set-env-vars=DB_USER=devpigh,DB_NAME=devpigh,DB_HOST=/cloudsql/$_INSTANCE_CONNECTION_NAME,USE_DB=postgres
+      - --set-env-vars=DB_USER=devpigh_admin,DB_NAME=devpigh,DB_HOST=/cloudsql/$_INSTANCE_CONNECTION_NAME,USE_DB=postgres,NODE_ENV=production
       - --set-secrets=DB_PASSWORD=devpigh-db-password:latest
       - --allow-unauthenticated
       - --min-instances=0

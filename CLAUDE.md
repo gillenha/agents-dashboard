@@ -40,7 +40,7 @@
 - Server events: agent:status, task:update, log:new, dashboard:summary (every 5s)
 - Client events: agent:subscribe, agent:unsubscribe (room-based filtering)
 - Repositories emit events on data changes via setIO() injection
-- src/simulation.ts runs random state changes every 3-8s for dev (disable for production)
+- simulation.ts runs random state changes every 3-8s for dev — disabled when NODE_ENV=production (guarded in index.ts)
 
 ## Dashboard Hooks
 - useSocket() — from SocketContext, returns socket instance + connection status
@@ -97,8 +97,22 @@
 - Processes tasks with input: { urls: string[] }
 - Returns: { results: [{ url, status_code, response_time_ms, healthy }] }
 - Dockerfile builds from repo root: docker build -f agents/health-checker/Dockerfile -t health-checker .
-- Cloud Run: needs --min-instances=1 (persistent poll loop, can't scale to zero)
-- Task creation: POST /api/v1/agents/:id/tasks with { title, input }
+- Deployed to Cloud Run as `health-checker` service (us-east1)
+  - Service URL: https://health-checker-368754647823.us-east1.run.app
+  - --min-instances=1 (persistent poll loop, can't scale to zero)
+  - --max-instances=1 (prevents duplicate agent registrations)
+  - --no-allow-unauthenticated (outbound-only worker, no inbound HTTP traffic)
+  - Uses devpigh-runner SA
+- Manual deploy: build from repo root, push, deploy:
+  docker buildx build --platform linux/amd64 -f agents/health-checker/Dockerfile -t us-east1-docker.pkg.dev/harry-gillen-builder/devpigh/health-checker:latest .
+  docker push us-east1-docker.pkg.dev/harry-gillen-builder/devpigh/health-checker:latest
+  gcloud run deploy health-checker --region=us-east1 --image=us-east1-docker.pkg.dev/harry-gillen-builder/devpigh/health-checker:latest- Task creation: POST /api/v1/agents/:id/tasks with { title, input }
+
+## Worker Agent Pattern (Cloud Run)
+- Cloud Run requires containers to listen on an HTTP port for startup health checks
+- Worker agents (poll-loop, no inbound traffic) must run a minimal HTTP server on $PORT
+- Pattern: start a background thread with http.server.HTTPServer returning 200 on GET, before calling agent.run()
+- Without this, Cloud Run deploy hangs waiting for the port and eventually times out
 
 ## Production / Docker
 - Dockerfile at repo root: multi-stage build (node:20-alpine builder → lean production image)

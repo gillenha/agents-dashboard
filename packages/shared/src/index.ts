@@ -66,6 +66,7 @@ export interface UpdateAgentInput {
 }
 
 export interface CreateTaskInput {
+  title?: string;
   input: Record<string, unknown>;
 }
 

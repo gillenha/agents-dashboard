@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components';
 import { useAgentUpdates } from '@/hooks/useAgentUpdates';
 import { useTaskUpdates } from '@/hooks/useTaskUpdates';
 import { useLogStream } from '@/hooks/useLogStream';
+import { CreateTaskModal } from './components/CreateTaskModal';
 import styles from './AgentDetail.module.css';
 
 type Tab = 'overview' | 'tasks' | 'logs' | 'config';
@@ -32,6 +33,7 @@ export function AgentDetail() {
   const [tab, setTab] = useState<Tab>('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   // REST-fetched tasks (paginated)
   const [tasks, setTasks] = useState<PaginatedResponse<Task> | null>(null);
@@ -164,6 +166,11 @@ export function AgentDetail() {
 
       {tab === 'tasks' && (
         <div className={styles.tableCard}>
+          <div className={styles.tableActions}>
+            <button className={styles.createBtn} onClick={() => setCreateModalOpen(true)}>
+              + Create Task
+            </button>
+          </div>
           <div className={styles.tableWrapper}>
             {tasksLoading ? (
               <div className={styles.loading}>Loading…</div>
@@ -262,6 +269,12 @@ export function AgentDetail() {
           </pre>
         </div>
       )}
+
+      <CreateTaskModal
+        agentId={id!}
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+      />
     </div>
   );
 }

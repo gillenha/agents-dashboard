@@ -144,6 +144,30 @@
 }
 
 /* Tasks tab */
+.tableActions {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.createBtn {
+  height: var(--size-input-height);
+  padding: 0 var(--space-4);
+  background: var(--color-accent);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-sidebar-active);
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.createBtn:hover {
+  opacity: 0.88;
+}
+
 .tableCard {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
