@@ -53,6 +53,7 @@ export interface DashboardSummary {
 export interface CreateAgentInput {
   name: string;
   type: string;
+  status?: AgentStatus;
   config?: Record<string, unknown>;
 }
 

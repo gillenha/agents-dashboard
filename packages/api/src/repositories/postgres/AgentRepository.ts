@@ -66,10 +66,10 @@ export class PostgresAgentRepository implements IAgentRepository {
 
   async create(input: CreateAgentInput): Promise<Agent> {
     const result: QueryResult = await this.pool.query(
-      `INSERT INTO agents (name, type, config)
-       VALUES ($1, $2, $3)
+      `INSERT INTO agents (name, type, status, config)
+       VALUES ($1, $2, $3, $4)
        RETURNING *`,
-      [input.name, input.type, JSON.stringify(input.config ?? {})]
+      [input.name, input.type, input.status ?? 'idle', JSON.stringify(input.config ?? {})]
     );
     const agent = mapRow(result.rows[0]);
     this.io?.emit('agent:status', {

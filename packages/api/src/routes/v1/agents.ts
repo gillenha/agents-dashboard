@@ -28,7 +28,7 @@ export function agentRouter(
     if (!body.name || !body.type) {
       return res.status(400).json({ error: 'name and type are required' });
     }
-    const agent = await agentRepo.create(body);
+    const agent = await agentRepo.create({ ...body, status: body.status ?? 'idle' });
     res.status(201).json(agent);
   });
 

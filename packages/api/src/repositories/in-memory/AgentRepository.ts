@@ -43,7 +43,7 @@ export class InMemoryAgentRepository implements IAgentRepository {
       id: uuidv4(),
       name: input.name,
       type: input.type,
-      status: 'idle',
+      status: input.status ?? 'idle',
       lastHeartbeat: now,
       config: input.config ?? {},
       createdAt: now,
