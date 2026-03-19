@@ -96,5 +96,7 @@ setInterval(() => { checkHeartbeats().catch(console.error); }, 30_000);
 
 server.listen(PORT, () => {
   console.log(`[api] Listening on http://localhost:${PORT}`);
-  startSimulation(agentRepo, taskRepo, logRepo);
+  if (process.env.NODE_ENV !== 'production') {
+    startSimulation(agentRepo, taskRepo, logRepo);
+  }
 });

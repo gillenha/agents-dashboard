@@ -131,6 +131,7 @@
   - Prerequisite: `gcloud auth application-default login` before first proxy use
   - psql: `brew install libpq` (adds psql without full Postgres)
 - Full setup reference: `infra/gcp-setup.sh` (read section by section — not a blind-run script)
+- psql path (brew install libpq): /opt/homebrew/opt/libpq/bin/psql (add to PATH or use full path)
 
 ## CI / CD
 - Pipeline config: `cloudbuild.yaml` at repo root — triggered on every push to `main`
@@ -146,6 +147,12 @@
 - Trigger manually: `gcloud builds submit --config cloudbuild.yaml .`
 - View build logs: GCP console → Cloud Build → History, or `gcloud builds list --region=us-east1`
 - Cloud Build SA needs `roles/run.admin` and `roles/iam.serviceAccountUser` on `devpigh-runner` to deploy
+- Build trigger: `ai-agents-dash-build-trigger` (region: global, autodetect: true)
+- Trigger SA: `github-deployer@harry-gillen-builder.iam.gserviceaccount.com`
+  - roles/artifactregistry.writer on devpigh repo
+  - roles/run.admin on devpigh service
+  - roles/iam.serviceAccountUser on devpigh-runner SA
+- Manual submit requires COMMIT_SHA: `gcloud builds submit --config cloudbuild.yaml --region=us-east1 --substitutions=COMMIT_SHA=$(git rev-parse HEAD) .`
 
 ## Commands
 - `pnpm dev` — starts both API (3001) and dashboard (5173)
