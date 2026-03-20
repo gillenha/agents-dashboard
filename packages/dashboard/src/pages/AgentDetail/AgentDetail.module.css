@@ -228,6 +228,37 @@ tbody tr:hover {
   text-overflow: ellipsis;
 }
 
+/* Task expand/collapse */
+.expandCol {
+  width: var(--space-8);
+}
+
+.expandCell {
+  width: var(--space-8);
+  text-align: center;
+  color: var(--color-text-tertiary);
+}
+
+.expandableRow {
+  cursor: pointer;
+}
+
+.chevron {
+  display: inline-block;
+  font-size: var(--font-size-body);
+  line-height: 1;
+  transition: transform 0.15s;
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
+}
+
+.expansionCell {
+  padding: 0;
+  background: var(--color-bg);
+}
+
 /* Logs tab */
 .logList {
   display: flex;

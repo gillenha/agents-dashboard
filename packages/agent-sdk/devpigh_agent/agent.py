@@ -25,6 +25,36 @@ logger = logging.getLogger("devpigh.agent")
 _LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
 _LOG_DATE_FMT = "%Y-%m-%dT%H:%M:%S"
 
+_LEVEL_MAP = {
+    logging.WARNING: "warn",
+    logging.ERROR: "error",
+    logging.CRITICAL: "error",
+}
+
+
+class DashboardHandler(logging.Handler):
+    """Forwards log records to the dashboard API via send_log().
+
+    Minimum level is INFO — DEBUG records are not forwarded.
+    A reentrant guard prevents infinite loops if the HTTP client itself logs.
+    """
+
+    def __init__(self, client: "DevpighClient", agent_id: str) -> None:  # noqa: F821
+        super().__init__(level=logging.INFO)
+        self._client = client
+        self._agent_id = agent_id
+        self._emitting = False
+
+    def emit(self, record: logging.LogRecord) -> None:
+        if self._emitting:
+            return
+        self._emitting = True
+        try:
+            level = _LEVEL_MAP.get(record.levelno, "info")
+            self._client.send_log(self._agent_id, level, record.getMessage())
+        finally:
+            self._emitting = False
+
 
 class DevpighAgent(abc.ABC):
     """Abstract base class for devpigh agents.
@@ -54,6 +84,11 @@ class DevpighAgent(abc.ABC):
         agent = self._client.register(name, agent_type)
         self._agent_id: str = agent["id"]
         logger.info("Registered — agent ID: %s", self._agent_id)
+
+        # Forward future log records to the dashboard in real time
+        logging.getLogger("devpigh.agent").addHandler(
+            DashboardHandler(self._client, self._agent_id)
+        )
 
     @abc.abstractmethod
     def process_task(self, task: dict) -> dict:

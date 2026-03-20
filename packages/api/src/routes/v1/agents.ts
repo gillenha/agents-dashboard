@@ -75,6 +75,27 @@ export function agentRouter(
     res.status(201).json(task);
   });
 
+  // POST /agents/:id/logs
+  router.post('/:id/logs', async (req, res) => {
+    const agent = await agentRepo.findById(req.params.id);
+    if (!agent) return res.status(404).json({ error: 'Agent not found' });
+
+    const { level, message, metadata } = req.body as {
+      level: LogLevel;
+      message: string;
+      metadata?: Record<string, unknown>;
+    };
+    if (!level || !message) {
+      return res.status(400).json({ error: 'level and message are required' });
+    }
+    if (!['info', 'warn', 'error'].includes(level)) {
+      return res.status(400).json({ error: 'level must be info, warn, or error' });
+    }
+
+    const log = await logRepo.create(req.params.id, level, message, metadata);
+    res.status(201).json(log);
+  });
+
   // GET /agents/:id/logs
   router.get('/:id/logs', async (req, res) => {
     const agent = await agentRepo.findById(req.params.id);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { Agent, AgentLog, LogLevel, PaginatedResponse, Task } from '@devpigh/shared';
 import { api } from '@/api/client';
@@ -7,6 +7,7 @@ import { useAgentUpdates } from '@/hooks/useAgentUpdates';
 import { useTaskUpdates } from '@/hooks/useTaskUpdates';
 import { useLogStream } from '@/hooks/useLogStream';
 import { CreateTaskModal } from './components/CreateTaskModal';
+import { TaskResultPanel } from './components/TaskResultPanel';
 import styles from './AgentDetail.module.css';
 
 type Tab = 'overview' | 'tasks' | 'logs' | 'config';
@@ -34,6 +35,7 @@ export function AgentDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
 
   // REST-fetched tasks (paginated)
   const [tasks, setTasks] = useState<PaginatedResponse<Task> | null>(null);
@@ -96,6 +98,18 @@ export function AgentDetail() {
   const allLogs = [...liveNewLogs, ...restLogData]
     .filter((log, i, arr) => arr.findIndex((l) => l.id === log.id) === i)
     .filter((log) => !logLevel || log.level === logLevel);
+
+  const toggleExpand = (taskId: string) => {
+    setExpandedTaskIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(taskId)) {
+        next.delete(taskId);
+      } else {
+        next.add(taskId);
+      }
+      return next;
+    });
+  };
 
   if (loading) return <div className={styles.loading}>Loading…</div>;
   if (error) return <div className={styles.errorState}>{error}</div>;
@@ -184,19 +198,41 @@ export function AgentDetail() {
                     <th>Duration</th>
                     <th>Error</th>
                     <th>Created</th>
+                    <th className={styles.expandCol}></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {allTaskData.map((task) => (
-                    <tr key={task.id}>
-                      <td className={styles.mono}>{task.id.slice(0, 8)}…</td>
-                      <td><StatusBadge status={task.status} /></td>
-                      <td className={styles.mono}>{formatDate(task.startedAt)}</td>
-                      <td className={styles.mono}>{formatDuration(task.startedAt, task.completedAt)}</td>
-                      <td>{task.error ? <span className={styles.errorText}>{task.error}</span> : '—'}</td>
-                      <td className={styles.mono}>{formatDate(task.createdAt)}</td>
-                    </tr>
-                  ))}
+                  {allTaskData.map((task) => {
+                    const canExpand = task.status === 'completed' || task.status === 'failed';
+                    const isExpanded = expandedTaskIds.has(task.id);
+                    return (
+                      <Fragment key={task.id}>
+                        <tr
+                          className={canExpand ? styles.expandableRow : undefined}
+                          onClick={canExpand ? () => toggleExpand(task.id) : undefined}
+                        >
+                          <td className={styles.mono}>{task.id.slice(0, 8)}…</td>
+                          <td><StatusBadge status={task.status} /></td>
+                          <td className={styles.mono}>{formatDate(task.startedAt)}</td>
+                          <td className={styles.mono}>{formatDuration(task.startedAt, task.completedAt)}</td>
+                          <td>{task.error ? <span className={styles.errorText}>{task.error}</span> : '—'}</td>
+                          <td className={styles.mono}>{formatDate(task.createdAt)}</td>
+                          <td className={styles.expandCell}>
+                            {canExpand && (
+                              <span className={`${styles.chevron}${isExpanded ? ` ${styles.chevronOpen}` : ''}`}>›</span>
+                            )}
+                          </td>
+                        </tr>
+                        {isExpanded && (
+                          <tr>
+                            <td className={styles.expansionCell} colSpan={7}>
+                              <TaskResultPanel task={task} />
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             )}

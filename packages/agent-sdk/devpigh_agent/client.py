@@ -82,6 +82,25 @@ class DevpighClient:
         resp.raise_for_status()
         return resp.json()  # type: ignore[no-any-return]
 
+    def send_log(
+        self,
+        agent_id: str,
+        level: str,
+        message: str,
+        metadata: dict | None = None,
+    ) -> None:
+        """POST /api/v1/agents/{id}/logs — fire-and-forget log forwarding.
+
+        Errors are silently swallowed so logging never interrupts task processing.
+        """
+        try:
+            payload: dict[str, Any] = {"level": level, "message": message}
+            if metadata:
+                payload["metadata"] = metadata
+            self._request("POST", f"/api/v1/agents/{agent_id}/logs", json=payload)
+        except Exception:
+            pass
+
     def report_result(
         self,
         agent_id: str,

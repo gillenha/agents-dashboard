@@ -1,0 +1,188 @@
+.panel {
+  padding: var(--space-4) var(--space-6);
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Metadata row */
+.meta {
+  display: flex;
+  gap: var(--space-8);
+  margin-bottom: var(--space-4);
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+}
+
+.metaLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-table);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.metaValue {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Error block (failed tasks) */
+.errorBlock {
+  background: var(--color-status-error-bg);
+  border: 1px solid var(--color-status-error-dot);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.errorBlockLabel {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-table);
+  text-transform: uppercase;
+  color: var(--color-status-error-text);
+  margin-bottom: var(--space-1-5);
+}
+
+.errorBlockText {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-md);
+  color: var(--color-status-error-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+/* Result section (completed tasks) */
+.resultSection {}
+
+.sectionLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-table);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-2);
+}
+
+/* Health-checker results table */
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.resultTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-table);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.tdUrl {
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tdCode {
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.tdTime {
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.tdHealthy {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.resultTable tr:last-child .tdUrl,
+.resultTable tr:last-child .tdCode,
+.resultTable tr:last-child .tdTime,
+.resultTable tr:last-child .tdHealthy {
+  border-bottom: none;
+}
+
+/* Healthy/unhealthy badges */
+.healthyBadge,
+.unhealthyBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-base);
+}
+
+.healthyBadge {
+  color: var(--color-status-success-text);
+}
+
+.unhealthyBadge {
+  color: var(--color-status-error-text);
+}
+
+.dot {
+  width: var(--size-status-dot);
+  height: var(--size-status-dot);
+  border-radius: var(--radius-circle);
+  flex-shrink: 0;
+}
+
+.healthyBadge .dot {
+  background: var(--color-status-success-dot);
+}
+
+.unhealthyBadge .dot {
+  background: var(--color-status-error-dot);
+}
+
+/* Fallback JSON output */
+.jsonOutput {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-relaxed);
+  white-space: pre;
+  overflow-x: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin: 0;
+}
+
+.emptyOutput {
+  font-size: var(--font-size-base);
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
