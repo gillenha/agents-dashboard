@@ -11,6 +11,7 @@ import { agentRouter }     from './routes/v1/agents';
 import { taskRouter }      from './routes/v1/tasks';
 import { dashboardRouter } from './routes/v1/dashboard';
 import { startSimulation } from './simulation';
+import { pool } from './db/pool';
 
 const app    = express();
 const server = http.createServer(app);
@@ -46,6 +47,12 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// Global Express error handler — must be last middleware, catches next(err) from route handlers
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error('[express] Unhandled route error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 // Socket.io connection handling
 io.on('connection', (socket) => {
   console.log(`[ws] Client connected: ${socket.id}`);
@@ -57,46 +64,68 @@ io.on('connection', (socket) => {
 
 // Broadcast dashboard summary every 5 seconds
 async function broadcastSummary() {
-  const [agents, completedLast24h, allLast24h] = await Promise.all([
-    agentRepo.findAll(),
-    taskRepo.findCompletedSince(new Date(Date.now() - 24 * 60 * 60 * 1000)),
-    taskRepo.findSince(new Date(Date.now() - 24 * 60 * 60 * 1000)),
-  ]);
+  try {
+    const [agents, completedLast24h, allLast24h] = await Promise.all([
+      agentRepo.findAll(),
+      taskRepo.findCompletedSince(new Date(Date.now() - 24 * 60 * 60 * 1000)),
+      taskRepo.findSince(new Date(Date.now() - 24 * 60 * 60 * 1000)),
+    ]);
 
-  const agentsByStatus: Record<AgentStatus, number> = { idle: 0, running: 0, error: 0, offline: 0 };
-  for (const agent of agents) {
-    agentsByStatus[agent.status]++;
+    const agentsByStatus: Record<AgentStatus, number> = { idle: 0, running: 0, error: 0, offline: 0 };
+    for (const agent of agents) {
+      agentsByStatus[agent.status]++;
+    }
+
+    const failedLast24h = allLast24h.filter((t) => t.status === 'failed').length;
+    const errorRate     = allLast24h.length > 0 ? failedLast24h / allLast24h.length : 0;
+
+    io.emit('dashboard:summary', {
+      totalAgents: agents.length,
+      agentsByStatus,
+      tasksCompletedLast24h: completedLast24h.length,
+      errorRate: Math.round(errorRate * 1000) / 1000,
+      totalTasksLast24h: allLast24h.length,
+    });
+  } catch (err) {
+    console.error('[broadcastSummary] Error:', err);
   }
-
-  const failedLast24h = allLast24h.filter((t) => t.status === 'failed').length;
-  const errorRate     = allLast24h.length > 0 ? failedLast24h / allLast24h.length : 0;
-
-  io.emit('dashboard:summary', {
-    totalAgents: agents.length,
-    agentsByStatus,
-    tasksCompletedLast24h: completedLast24h.length,
-    errorRate: Math.round(errorRate * 1000) / 1000,
-    totalTasksLast24h: allLast24h.length,
-  });
 }
 
-setInterval(() => { broadcastSummary().catch(console.error); }, 5000);
+setInterval(() => { broadcastSummary(); }, 5000);
 
 // Heartbeat monitor — runs every 30s, marks agents offline if last_heartbeat > 90s ago
 async function checkHeartbeats() {
-  const staleThreshold = new Date(Date.now() - 90 * 1000);
-  const staleAgents = await agentRepo.findStale(staleThreshold);
-  for (const agent of staleAgents) {
-    await agentRepo.update(agent.id, { status: 'offline' });
-    console.log(`[heartbeat] Agent ${agent.id} (${agent.name}) marked offline`);
+  try {
+    const staleThreshold = new Date(Date.now() - 90 * 1000);
+    const staleAgents = await agentRepo.findStale(staleThreshold);
+    for (const agent of staleAgents) {
+      await agentRepo.update(agent.id, { status: 'offline' });
+      console.log(`[heartbeat] Agent ${agent.id} (${agent.name}) marked offline`);
+    }
+  } catch (err) {
+    console.error('[checkHeartbeats] Error:', err);
   }
 }
 
-setInterval(() => { checkHeartbeats().catch(console.error); }, 30_000);
+setInterval(() => { checkHeartbeats(); }, 30_000);
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`[api] Listening on http://localhost:${PORT}`);
   if (process.env.NODE_ENV !== 'production') {
     startSimulation(agentRepo, taskRepo, logRepo);
+  }
+
+  // Startup diagnostic — logs DB user, tables, and permissions to help diagnose Cloud Run issues
+  if (process.env.USE_DB !== 'memory') {
+    try {
+      const result = await pool.query('SELECT current_user, current_database()');
+      console.log('[db] Connected as:', result.rows[0]);
+      const tables = await pool.query("SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
+      console.log('[db] Tables:', tables.rows.map(r => r.tablename));
+      const perms = await pool.query("SELECT has_table_privilege(current_user, 'agents', 'SELECT') as can_select");
+      console.log('[db] Can SELECT agents:', perms.rows[0].can_select);
+    } catch (err) {
+      console.error('[db] Startup diagnostic FAILED:', err);
+    }
   }
 });

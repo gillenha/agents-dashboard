@@ -4,3 +4,5 @@ dist/
 
 infra/gcp-setup.sh
 cloud-sql-proxy
+
+test.json
