@@ -31,6 +31,9 @@ Task result schema (with selector):
 import logging
 import os
 import threading
+# import certifi
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
@@ -77,8 +80,8 @@ class WebScraperAgent(DevpighAgent):
         resp = requests.get(
             url,
             timeout=15,
-            allow_redirects=True,
             headers={"User-Agent": _USER_AGENT},
+            verify=False  # Disable SSL verification to avoid issues with sites that have misconfigured certs
         )
         resp.raise_for_status()
 

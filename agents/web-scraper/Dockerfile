@@ -2,6 +2,7 @@
 # Run: docker build -f agents/web-scraper/Dockerfile -t web-scraper .
 
 FROM python:3.12-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -10,9 +11,11 @@ WORKDIR /app
 COPY packages/agent-sdk /tmp/agent-sdk
 RUN pip install --no-cache-dir /tmp/agent-sdk
 
+
 # Install agent-specific dependencies
 COPY agents/web-scraper/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade certifi
 
 # Copy agent source
 COPY agents/web-scraper/main.py .
