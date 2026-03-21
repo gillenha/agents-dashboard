@@ -1,0 +1,4 @@
+# No direct dependencies beyond the devpigh-agent SDK.
+# devpigh-agent SDK is installed separately:
+#   local dev: pip install -e ../../packages/agent-sdk
+#   Docker:    see Dockerfile (COPY + pip install /tmp/agent-sdk)
