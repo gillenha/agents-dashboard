@@ -8,6 +8,14 @@ export function agentApiRouter(
 ): Router {
   const router = Router();
 
+  // ── GET /by-name/:name ───────────────────────────────────────────────────────
+  // Look up an agent by name — lets agents find peers without hardcoding IDs.
+  router.get('/by-name/:name', async (req, res) => {
+    const agent = await agentRepo.findByName(req.params.name);
+    if (!agent) return res.status(404).json({ error: 'Agent not found' });
+    res.json(agent);
+  });
+
   // ── POST /register ──────────────────────────────────────────────────────────
   // Agents call this on startup. Upserts by name: creates if new, refreshes if existing.
   router.post('/register', async (req, res) => {

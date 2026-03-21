@@ -101,6 +101,30 @@ class DevpighClient:
         except Exception:
             pass
 
+    def find_agent_by_name(self, name: str) -> dict | None:
+        """GET /api/v1/agents/by-name/{name} — returns agent dict or None on 404."""
+        resp = self._request("GET", f"/api/v1/agents/by-name/{name}")
+        if resp.status_code == 404:
+            return None
+        resp.raise_for_status()
+        return resp.json()  # type: ignore[no-any-return]
+
+    def create_task(self, agent_id: str, task_input: dict) -> dict:
+        """POST /api/v1/agents/{agent_id}/tasks — creates a queued task."""
+        resp = self._request(
+            "POST", f"/api/v1/agents/{agent_id}/tasks", json={"input": task_input}
+        )
+        resp.raise_for_status()
+        return resp.json()  # type: ignore[no-any-return]
+
+    def get_task(self, task_id: str) -> dict | None:
+        """GET /api/v1/tasks/{task_id} — returns task dict or None on 404."""
+        resp = self._request("GET", f"/api/v1/tasks/{task_id}")
+        if resp.status_code == 404:
+            return None
+        resp.raise_for_status()
+        return resp.json()  # type: ignore[no-any-return]
+
     def report_result(
         self,
         agent_id: str,

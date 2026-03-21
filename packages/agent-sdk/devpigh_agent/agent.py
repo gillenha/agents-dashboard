@@ -12,6 +12,7 @@ import logging
 import os
 import signal
 import threading
+import time
 import types
 
 from dotenv import load_dotenv
@@ -106,6 +107,69 @@ class DevpighAgent(abc.ABC):
             Any exception — the base class catches it, reports the task as
             "failed" with str(exception) as the error, and continues polling.
         """
+
+    def delegate_task(
+        self,
+        agent_name: str,
+        task_input: dict,
+        timeout: int = 120,
+        poll_interval: int = 3,
+    ) -> dict:
+        """Create a task on another agent and wait for it to complete.
+
+        Args:
+            agent_name:    Name of the target agent (must be online or idle).
+            task_input:    The input dict to pass to the target agent.
+            timeout:       Maximum seconds to wait for completion (default 120).
+            poll_interval: Seconds between status polls (default 3).
+
+        Returns:
+            The task output dict on success.
+
+        Raises:
+            ValueError:   Target agent not found or not in a ready state.
+            RuntimeError: Task failed — includes the error message from the task.
+            TimeoutError: Task did not complete within the timeout window.
+        """
+        logger.info("Delegating task to agent '%s'", agent_name)
+
+        target = self._client.find_agent_by_name(agent_name)
+        if target is None:
+            raise ValueError(f"Agent '{agent_name}' not found")
+        if target.get("status") not in ("idle", "online"):
+            raise ValueError(
+                f"Agent '{agent_name}' is not ready (status={target.get('status')})"
+            )
+
+        task = self._client.create_task(target["id"], task_input)
+        task_id: str = task["id"]
+        logger.info(
+            "Task %s created for agent '%s' (%s)", task_id, agent_name, target["id"]
+        )
+
+        deadline = time.monotonic() + timeout
+        while True:
+            elapsed = deadline - time.monotonic()
+            if elapsed <= 0:
+                raise TimeoutError(
+                    f"Task {task_id} did not complete within {timeout}s"
+                )
+
+            time.sleep(poll_interval)
+
+            current = self._client.get_task(task_id)
+            if current is None:
+                raise RuntimeError(f"Task {task_id} disappeared during polling")
+
+            status = current.get("status")
+            logger.info("Polling task %s — status: %s", task_id, status)
+
+            if status == "completed":
+                logger.info("Task %s completed", task_id)
+                return current.get("output") or {}
+            if status == "failed":
+                error_msg = current.get("error") or "unknown error"
+                raise RuntimeError(f"Task {task_id} failed: {error_msg}")
 
     def run(self) -> None:
         """Start the heartbeat thread and poll loop. Blocks until shutdown."""
