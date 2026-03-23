@@ -108,11 +108,45 @@
   docker push us-east1-docker.pkg.dev/harry-gillen-builder/devpigh/health-checker:latest
   gcloud run deploy health-checker --region=us-east1 --image=us-east1-docker.pkg.dev/harry-gillen-builder/devpigh/health-checker:latest- Task creation: POST /api/v1/agents/:id/tasks with { title, input }
 
+## Web Scraper Agent (agents/web-scraper/)
+- Second agent, subclasses DevpighAgent from packages/agent-sdk
+- Processes tasks with input: { url: string, selector?: string }
+- Without selector: returns page title + full visible text (scripts/styles/nav/footer stripped)
+- With selector: returns list of matched element text
+- Returns: { url, title, content, selector_used, content_length, fetched_at }
+- Uses verify=False for SSL (Cloud Run cert bundle issue with outbound HTTPS)
+- Deployed to Cloud Run as `web-scraper` service (us-east1), same config as health-checker
+
+## Content Analyzer Agent (agents/content-analyzer/)
+- Third agent, Claude-powered via Anthropic Python SDK
+- Processes tasks with input: { text: string, instruction: string }
+- Returns: { instruction, input_length, response, response_length, model, usage }
+- Uses claude-sonnet-4-20250514, ANTHROPIC_API_KEY from Secret Manager
+- Deployed to Cloud Run as `content-analyzer` service with --set-secrets=ANTHROPIC_API_KEY=anthropic-api-key:latest
+
+## Orchestrator Agent (agents/orchestrator/)
+- Fourth agent, chains health-checker → web-scraper → content-analyzer
+- Processes tasks with input: { url: string, instruction: string }
+- Delegates to each agent in sequence using SDK's delegate_task() method
+- Returns combined result with steps.health_check, steps.scrape, steps.analysis, and final_response
+- Graceful partial failure: if any step fails, returns what it has with error details
+- No API keys of its own — delegates to content-analyzer for Claude access
+- Deployed to Cloud Run as `orchestrator` service, same config as health-checker
+
 ## Worker Agent Pattern (Cloud Run)
 - Cloud Run requires containers to listen on an HTTP port for startup health checks
 - Worker agents (poll-loop, no inbound traffic) must run a minimal HTTP server on $PORT
 - Pattern: start a background thread with http.server.HTTPServer returning 200 on GET, before calling agent.run()
 - Without this, Cloud Run deploy hangs waiting for the port and eventually times out
+- All agents using outbound HTTPS to external sites need verify=False on requests.get() (Cloud Run cert bundle issue)
+- Suppress warnings with: urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+## Agent Delegation (inter-agent communication)
+- SDK methods: delegate_task(agent_name, task_input, timeout, poll_interval)
+- Client methods: find_agent_by_name(name), create_task(agent_id, input), get_task(task_id)
+- API endpoints: GET /api/v1/agents/by-name/:name, GET /api/v1/tasks/:taskId
+- Agents look up other agents by name, create tasks, poll for completion
+- No Pub/Sub needed yet — delegation is synchronous via API polling
 
 ## Production / Docker
 - Dockerfile at repo root: multi-stage build (node:20-alpine builder → lean production image)

@@ -23,6 +23,8 @@ import logging
 import os
 import threading
 import time
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 import requests
@@ -76,7 +78,7 @@ class HealthCheckerAgent(DevpighAgent):
     def _check_url(self, url: str) -> dict:
         start = time.perf_counter()
         try:
-            resp = requests.get(url, timeout=10, allow_redirects=True)
+            resp = requests.get(url, timeout=10, allow_redirects=True, verify=False)
             elapsed_ms = round((time.perf_counter() - start) * 1000)
             return {
                 "url": url,
