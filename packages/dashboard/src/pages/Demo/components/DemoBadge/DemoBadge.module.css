@@ -1,0 +1,40 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-0-5) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-badge);
+  white-space: nowrap;
+}
+
+/* new → info (blue) */
+.new {
+  background: var(--color-status-info-bg);
+  color: var(--color-status-info-text);
+}
+
+/* tour_scheduled → running (teal) */
+.tourScheduled {
+  background: var(--color-status-running-bg);
+  color: var(--color-status-running-text);
+}
+
+/* follow_up_sent → warn (amber) */
+.followUpSent {
+  background: var(--color-status-warn-bg);
+  color: var(--color-status-warn-text);
+}
+
+/* escalated → error (red) */
+.escalated {
+  background: var(--color-status-error-bg);
+  color: var(--color-status-error-text);
+}
+
+/* resolved → success (green) */
+.resolved {
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success-text);
+}

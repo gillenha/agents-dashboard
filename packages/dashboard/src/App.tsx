@@ -5,6 +5,7 @@ import { Overview } from '@/pages/Overview';
 import { Agents } from '@/pages/Agents';
 import { AgentDetail } from '@/pages/AgentDetail';
 import { Tasks } from '@/pages/Tasks';
+import Demo from '@/pages/Demo';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/agents/:id" element={<AgentDetail />} />
           <Route path="/tasks" element={<Tasks />} />
         </Route>
+        <Route path="/demo/:clientSlug" element={<Demo />} />
       </Routes>
     </SocketProvider>
   );

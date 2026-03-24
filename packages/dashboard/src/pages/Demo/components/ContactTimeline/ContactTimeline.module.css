@@ -1,0 +1,165 @@
+.timeline {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-bg);
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-body);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2-5);
+}
+
+.contactName {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.channel {
+  font-size: var(--font-size-md);
+  color: var(--color-text-tertiary);
+}
+
+.escalationBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2-5) var(--space-5);
+  background: var(--color-status-error-bg);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-md);
+  color: var(--color-status-error-text);
+  flex-shrink: 0;
+}
+
+.escalationIcon {
+  flex-shrink: 0;
+}
+
+.events {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* System event row */
+.systemEvent {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-1-5) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  flex-wrap: wrap;
+}
+
+.systemTime {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.systemActor {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.systemDot {
+  color: var(--color-text-tertiary);
+}
+
+.systemMessage {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* SMS bubbles */
+.bubble {
+  display: flex;
+  flex-direction: column;
+  max-width: 72%;
+}
+
+.bubbleLeft {
+  align-self: flex-start;
+}
+
+.bubbleRight {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.bubbleMeta {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+  align-items: baseline;
+}
+
+.bubbleLeft .bubbleMeta {
+  flex-direction: row;
+}
+
+.bubbleRight .bubbleMeta {
+  flex-direction: row-reverse;
+}
+
+.bubbleActor {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.bubbleTime {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.bubbleText {
+  padding: var(--space-2-5) var(--space-3);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+.bubbleTextLeft {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  border-top-left-radius: var(--radius-sm);
+}
+
+.bubbleTextRight {
+  background: var(--color-accent);
+  color: #ffffff;
+  border-top-right-radius: var(--radius-sm);
+}

@@ -1,0 +1,68 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+  height: var(--topbar-height);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.clientInfo {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.clientName {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.clientLocation {
+  font-size: var(--font-size-md);
+  color: var(--color-text-tertiary);
+}
+
+.poweredBy {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1-5);
+}
+
+.poweredByLabel {
+  font-size: var(--font-size-md);
+  color: var(--color-text-tertiary);
+}
+
+.brand {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent);
+  letter-spacing: var(--tracking-logo);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 30% 40% 30%;
+  flex: 1;
+  overflow: hidden;
+}
+
+.colLeft,
+.colCenter,
+.colRight {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
