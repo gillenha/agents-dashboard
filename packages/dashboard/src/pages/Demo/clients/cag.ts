@@ -390,3 +390,97 @@ export const cagConfig: ClientConfig = {
     },
   ],
 };
+
+// ── Simulation flow ───────────────────────────────────────────────────────────
+
+export interface SimStep {
+  delayMs: number;
+  event?: {
+    id: string;
+    actor: Actor;
+    type: EventType;
+    message: string;
+  };
+  statusUpdate?: ContactStatus;
+  previewUpdate?: string;
+  /** If defined, set the "thinking" indicator to this value after this step fires. */
+  thinking?: boolean;
+}
+
+const TOUR_SLOT = 'Thursday, March 26 at 2:00 PM';
+
+export const marcusWebbSimFlow: SimStep[] = [
+  {
+    delayMs: 0,
+    event: {
+      id: 'sim-1',
+      actor: 'Applicant',
+      type: 'sms',
+      message:
+        'Hi, I saw the 3443 Bowman St listing on Zillow. Is it still available and can I schedule a tour?',
+    },
+    previewUpdate: 'Hi, I saw the 3443 Bowman St listing on Zillow...',
+    thinking: false,
+  },
+  {
+    delayMs: 1500,
+    event: {
+      id: 'sim-2',
+      actor: 'IntakeAgent',
+      type: 'system',
+      message: 'Message received. Classified as TOUR_REQUEST. Routing to SchedulingAgent.',
+    },
+    thinking: true,
+  },
+  {
+    delayMs: 3000,
+    event: {
+      id: 'sim-3',
+      actor: 'SchedulingAgent',
+      type: 'system',
+      message: `Availability check complete. Next available slot: ${TOUR_SLOT}. Preparing confirmation.`,
+    },
+    thinking: true,
+  },
+  {
+    delayMs: 5000,
+    event: {
+      id: 'sim-4',
+      actor: 'CommunicationAgent',
+      type: 'sms',
+      message: `Hi Marcus! Thanks for your interest in 3443 Bowman St. We have a tour available ${TOUR_SLOT}. Reply YES to confirm or call us at any time. — CAG Property Management`,
+    },
+    thinking: false,
+    previewUpdate: `Tour available ${TOUR_SLOT} — awaiting confirmation`,
+  },
+  {
+    delayMs: 8000,
+    event: {
+      id: 'sim-5',
+      actor: 'Applicant',
+      type: 'sms',
+      message: 'YES',
+    },
+  },
+  {
+    delayMs: 9500,
+    event: {
+      id: 'sim-6',
+      actor: 'CommunicationAgent',
+      type: 'sms',
+      message: `You're confirmed! Tour at 3443 Bowman St on ${TOUR_SLOT}. We'll meet you at the front entrance. See you then! — CAG Property Management`,
+    },
+  },
+  {
+    delayMs: 11000,
+    event: {
+      id: 'sim-7',
+      actor: 'CommunicationAgent',
+      type: 'system',
+      message: 'Tour confirmed. Calendar event created. No further action required.',
+    },
+    statusUpdate: 'tour_scheduled',
+    previewUpdate: `Tour confirmed — ${TOUR_SLOT}`,
+    thinking: false,
+  },
+];

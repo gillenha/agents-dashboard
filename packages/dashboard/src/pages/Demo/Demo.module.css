@@ -52,6 +52,33 @@
   letter-spacing: var(--tracking-logo);
 }
 
+.runButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  padding: 0 var(--space-4);
+  height: 32px;
+  background: var(--color-accent);
+  color: var(--color-text-sidebar-active);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: var(--transition-all);
+  white-space: nowrap;
+}
+
+.runButton:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.runButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .columns {
   display: grid;
   grid-template-columns: 30% 40% 30%;

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { cagConfig } from './clients/cag';
 import type { ClientConfig } from './clients/cag';
+import { useSimulation } from './hooks/useSimulation';
 import InquiryFeed from './components/InquiryFeed';
 import ContactTimeline from './components/ContactTimeline';
 import EscalationQueue from './components/EscalationQueue';
@@ -19,11 +20,34 @@ export default function Demo() {
     config?.contacts[0]?.id ?? null,
   );
 
+  const { state: simState, start: startSim } = useSimulation();
+
+  // Auto-select Marcus Webb when simulation starts
+  useEffect(() => {
+    if (simState.running) {
+      setSelectedId('marcus-webb');
+    }
+  }, [simState.running]);
+
   if (!config) {
     return <Navigate to="/" replace />;
   }
 
-  const selectedContact = config.contacts.find((c) => c.id === selectedId) ?? null;
+  // Replace the static marcus-webb entry with the live sim contact when active
+  const displayContacts = simState.simContact
+    ? [
+        simState.simContact,
+        ...config.contacts.filter((c) => c.id !== 'marcus-webb'),
+      ]
+    : config.contacts;
+
+  // Resolve the selected contact — use simContact when applicable
+  const selectedContact =
+    selectedId === 'marcus-webb' && simState.simContact
+      ? simState.simContact
+      : config.contacts.find((c) => c.id === selectedId) ?? null;
+
+  const isSimView = selectedId === 'marcus-webb' && simState.simContact !== null;
 
   return (
     <div className={styles.page}>
@@ -32,6 +56,15 @@ export default function Demo() {
           <span className={styles.clientName}>{config.name}</span>
           <span className={styles.clientLocation}>{config.location}</span>
         </div>
+
+        <button
+          className={styles.runButton}
+          onClick={startSim}
+          disabled={simState.running}
+        >
+          {simState.running ? '● Running...' : '▶ Run Live Demo'}
+        </button>
+
         <div className={styles.poweredBy}>
           <span className={styles.poweredByLabel}>Powered by</span>
           <span className={styles.brand}>devpigh</span>
@@ -41,16 +74,20 @@ export default function Demo() {
       <div className={styles.columns}>
         <div className={styles.colLeft}>
           <InquiryFeed
-            contacts={config.contacts}
+            contacts={displayContacts}
             selectedId={selectedId}
             onSelect={setSelectedId}
           />
         </div>
         <div className={styles.colCenter}>
-          <ContactTimeline contact={selectedContact} />
+          <ContactTimeline
+            contact={selectedContact}
+            isSimulation={isSimView}
+            showThinking={isSimView && simState.thinking}
+          />
         </div>
         <div className={styles.colRight}>
-          <EscalationQueue contacts={config.contacts} onSelect={setSelectedId} />
+          <EscalationQueue contacts={displayContacts} onSelect={setSelectedId} />
         </div>
       </div>
     </div>
